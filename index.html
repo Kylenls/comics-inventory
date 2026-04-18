@@ -345,6 +345,51 @@
   .show { display: block !important; }
   .hidden { display: none !important; }
 </style>
+
+<script>
+(function() {
+  const CORRECT_PIN = '104545';
+  const SESSION_KEY = 'arc2_auth';
+  
+  if (sessionStorage.getItem(SESSION_KEY) !== 'true') {
+    document.addEventListener('DOMContentLoaded', function() {
+      const overlay = document.createElement('div');
+      overlay.id = 'pin-overlay';
+      overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#0a0c10;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;';
+      overlay.innerHTML = `
+        <div style="text-align:center;padding:2rem">
+          <div style="font-size:32px;margin-bottom:8px">⚡</div>
+          <h1 style="font-family:Rajdhani,sans-serif;color:#5bc8f5;font-size:24px;margin-bottom:4px">A.R.C²</h1>
+          <p style="color:#6c757d;font-size:13px;margin-bottom:2rem">Enter PIN to continue</p>
+          <input type="password" id="pin-input" maxlength="6" placeholder="••••••"
+            style="text-align:center;font-size:24px;letter-spacing:8px;padding:12px 20px;border:1px solid #dee2e6;border-radius:10px;width:180px;outline:none;margin-bottom:1rem;display:block;margin:0 auto 1rem auto"
+            onkeydown="if(event.key==='Enter')checkPin()" />
+          <button onclick="checkPin()"
+            style="padding:10px 32px;background:#0066cc;color:white;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit">
+            Unlock
+          </button>
+          <p id="pin-error" style="color:#dc3545;font-size:13px;margin-top:12px;display:none">Incorrect PIN</p>
+        </div>
+      `;
+      document.body.appendChild(overlay);
+      setTimeout(() => document.getElementById('pin-input').focus(), 100);
+    });
+  }
+
+  window.checkPin = function() {
+    const input = document.getElementById('pin-input');
+    if (input.value === CORRECT_PIN) {
+      sessionStorage.setItem('arc2_auth', 'true');
+      document.getElementById('pin-overlay').remove();
+    } else {
+      document.getElementById('pin-error').style.display = 'block';
+      input.value = '';
+      input.focus();
+    }
+  };
+})();
+</script>
+
 </head>
 <body>
 <div class="app">
