@@ -230,6 +230,7 @@
   .scanner-cancel-btn { background: rgba(255,255,255,0.1); color: white; }
   .scanner-manual-btn { background: var(--neon-glow); color: var(--neon-bright); border: 1px solid var(--neon-dim); }
   .barcode-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#000; z-index:1000; flex-direction:column; }
+  .barcode-overlay.open { display:flex; }
   #barcode-video { width:100%; height:100%; object-fit:cover; }
   .barcode-finder { position:absolute; top:50%; left:50%; transform:translate(-50%,-60%); width:85%; max-width:340px; height:200px; }
   .barcode-finder::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:var(--neon); animation:scan 2s linear infinite; box-shadow: 0 0 8px var(--neon); }
@@ -1148,6 +1149,44 @@ let barcodeInterval = null;
 let barcodeDetector = null;
 
 async function openBarcodeScanner() {
+  // On mobile use native camera capture for reliability
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.capture = 'environment';
+  input.style.display = 'none';
+  document.body.appendChild(input);
+  input.onchange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    showStatus('add-status', 'Reading barcode...', 'loading');
+    const reader = new FileReader();
+    reader.onload = async (ev) => {
+      const base64 = ev.target.result.split(',')[1];
+      try {
+        const res = await fetch('/.netlify/functions/decodebarcode', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ imageBase64: base64 })
+        });
+        const data = await res.json();
+        if (data.barcode) {
+          if (data.variant) document.getElementById('add-variant').value = data.variant;
+          await processBarcodeResult(data.barcode, data.variant, data.printRun);
+        } else {
+          showStatus('add-status', 'No barcode found — try scanning the cover instead', 'error');
+        }
+      } catch(e) {
+        showStatus('add-status', 'Error: ' + e.message, 'error');
+      }
+    };
+    reader.readAsDataURL(file);
+    document.body.removeChild(input);
+  };
+  input.click();
+  return;
+  // Legacy camera code below (desktop fallback)
+  const _unused = async function() {
   barcodeTriggered = false;
   document.getElementById('barcode-overlay').classList.add('open');
   document.getElementById('barcode-status').textContent = 'Starting camera...';
@@ -1333,7 +1372,7 @@ function closeBarcodeScanner() {
   barcodeDetector = null;
   barcodeTriggered = false;
   barcodeInterval = null;
-  document.getElementById('barcode-capture-btn').style.display = 'none';
+  // capture button shown by default
   document.getElementById('barcode-overlay').classList.remove('open');
 }
 
@@ -4474,7 +4513,7 @@ function closeSellModal() {
   </div>
   <div class="barcode-bottom">
     <button class="bc-cancel" onclick="closeBarcodeScanner()">Cancel</button>
-    <button class="bc-manual" id="barcode-capture-btn" style="display:none" onclick="captureBarcode()">Capture Barcode</button>
+    <button class="bc-manual" id="barcode-capture-btn" style="display:block" onclick="captureBarcode()">Capture Barcode</button>
     <button class="bc-manual" onclick="closeBarcodeScanner();document.getElementById('cover-input').click()">Skip to Cover</button>
   </div>
 </div>
