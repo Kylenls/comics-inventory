@@ -391,6 +391,7 @@
 })();
 </script>
 
+<script src="https://cdn.jsdelivr.net/npm/@zxing/browser@0.1.1/umd/index.min.js"></script>
 </head>
 <body>
 <div class="app">
@@ -1150,7 +1151,41 @@ let barcodeInterval = null;
 let barcodeDetector = null;
 
 async function openBarcodeScanner() {
-  document.getElementById('barcode-file-input').click();
+  const overlay = document.getElementById('barcode-overlay');
+  overlay.style.display = 'flex';
+  document.getElementById('barcode-status').textContent = 'Starting camera...';
+  barcodeTriggered = false;
+
+  try {
+    if (typeof ZXingBrowser === 'undefined') {
+      throw new Error('Barcode library not loaded');
+    }
+    
+    const codeReader = new ZXingBrowser.BrowserMultiFormatReader();
+    const videoEl = document.getElementById('barcode-video');
+    
+    document.getElementById('barcode-status').textContent = 'Point at barcode — scanning...';
+    
+    await codeReader.decodeFromConstraints(
+      { video: { facingMode: { ideal: 'environment' } } },
+      videoEl,
+      (result, error, controls) => {
+        if (result && !barcodeTriggered) {
+          barcodeTriggered = true;
+          controls.stop();
+          const code = result.getText();
+          document.getElementById('barcode-status').textContent = 'Found: ' + code;
+          setTimeout(() => {
+            closeBarcodeScanner();
+            processBarcodeResult(code, null, null);
+          }, 500);
+        }
+      }
+    );
+  } catch(e) {
+    overlay.style.display = 'none';
+    showStatus('add-status', 'Scanner error: ' + e.message + ' — try Scan Cover instead', 'error');
+  }
 }
 
 
