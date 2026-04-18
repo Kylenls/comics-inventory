@@ -9,23 +9,23 @@
   @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
 
   :root {
-    --bg:           #0a0c10;
-    --bg-card:      #0f1318;
-    --bg-elevated:  #141820;
-    --border:       #1e2530;
-    --border-glow:  #2a9fd6;
-    --neon:         #5bc8f5;
-    --neon-bright:  #8de4ff;
-    --neon-dim:     #2a6f8a;
-    --neon-glow:    rgba(91,200,245,0.15);
-    --neon-glow-sm: rgba(91,200,245,0.08);
-    --accent:       #e24b4a;
-    --accent-glow:  rgba(226,75,74,0.2);
-    --success:      #3dd68c;
-    --success-dim:  rgba(61,214,140,0.1);
-    --text:         #e8edf2;
-    --text-muted:   #5a6a7a;
-    --text-dim:     #3a4a5a;
+    --bg:           #f8f9fa;
+    --bg-card:      #ffffff;
+    --bg-elevated:  #f0f2f5;
+    --border:       #dee2e6;
+    --border-glow:  #0066cc;
+    --neon:         #0066cc;
+    --neon-bright:  #0052a3;
+    --neon-dim:     #4d94ff;
+    --neon-glow:    rgba(0,102,204,0.1);
+    --neon-glow-sm: rgba(0,102,204,0.05);
+    --accent:       #dc3545;
+    --accent-glow:  rgba(220,53,69,0.15);
+    --success:      #198754;
+    --success-dim:  rgba(25,135,84,0.1);
+    --text:         #212529;
+    --text-muted:   #6c757d;
+    --text-dim:     #adb5bd;
     --font-display: 'Rajdhani', sans-serif;
     --font-body:    'Inter', sans-serif;
   }
@@ -47,7 +47,7 @@
     position: fixed;
     inset: 0;
     background-image:
-      linear-gradient(rgba(91,200,245,0.03) 1px, transparent 1px),
+      linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px),
       linear-gradient(90deg, rgba(91,200,245,0.03) 1px, transparent 1px);
     background-size: 40px 40px;
     pointer-events: none;
@@ -380,7 +380,7 @@
           <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M4 6h2v12H4zm3 0h1v12H7zm2 0h2v12H9zm3 0h1v12h-1zm2 0h2v12h-2zm3 0h1v12h-1zM2 4v4H0V4C0 2.9.9 2 2 2h4v2H2zm20-2c1.1 0 2 .9 2 2v4h-2V4h-4V2h4zM2 16v4h4v2H2c-1.1 0-2-.9-2-2v-4h2zm20 4v-4h2v4c0 1.1-.9 2-2 2h-4v-2h4z"/></svg>
           Scan Barcode
         </button>
-        <button class="btn-scan" style="font-size:13px;padding:11px 8px;background:#0d1f35;border:1px solid #2a6f8a" onclick="document.getElementById('cover-input').click()">
+        <button class="btn-scan" style="font-size:13px;padding:11px 8px;background:#0066cc;border:1px solid #0066cc" onclick="document.getElementById('cover-input').click()">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M12 15.2l-4.8-6.4L4 12h16l-5.2-6.933L12 8.8l-3.2-4.267L4 12h16zM20 3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>
           Scan Cover
         </button>
@@ -494,7 +494,7 @@
   <!-- INVOICE IMPORT -->
   <div class="panel" id="panel-invoice">
     <div class="card">
-      <div class="defaults-title" style="font-size:13px;font-weight:600;color:#e8edf2;margin-bottom:1rem">Import Invoice</div>
+      <div class="defaults-title" style="font-size:13px;font-weight:600;color:#212529;margin-bottom:1rem">Import Invoice</div>
 
       <div class="field">
         <label>Distributor</label>
@@ -552,7 +552,7 @@
   <!-- FOC ANALYSIS -->
   <div class="panel" id="panel-foc">
     <div class="card">
-      <div class="defaults-title" style="font-size:13px;font-weight:600;color:#e8edf2;margin-bottom:0.5rem">🧠 FOC Analysis — Agent 1</div>
+      <div class="defaults-title" style="font-size:13px;font-weight:600;color:#212529;margin-bottom:0.5rem">🧠 FOC Analysis — Agent 1</div>
       <p style="font-size:13px;color:#666;margin-bottom:1rem">Upload your FOC catalog from Lunar or Penguin. Agent 1 will analyze every title and recommend what to buy based on your cash position.</p>
 
       <!-- Distributor selector -->
@@ -569,7 +569,7 @@
         ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleFOCDrop(event)">
         <div style="font-size:32px;margin-bottom:8px">📋</div>
         <strong id="foc-drop-label">Drop Lunar FOC file here</strong>
-        <p style="color:#5a6a7a;font-size:13px">Lunar_Available_Products_FOC-*.csv</p>
+        <p style="color:#6c757d;font-size:13px">Lunar_Available_Products_FOC-*.csv</p>
         <input type="file" id="foc-file" accept=".csv,.xlsx,.xls,.pdf" style="display:none" onchange="handleFOCFile(event)" />
       </div>
       <div class="status" id="foc-status"></div>
@@ -581,10 +581,10 @@
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
           <div>
             <div style="font-size:13px;font-weight:600" id="foc-summary-title">FOC Summary</div>
-            <div style="font-size:12px;color:#5a6a7a" id="foc-summary-sub"></div>
+            <div style="font-size:12px;color:#6c757d" id="foc-summary-sub"></div>
           </div>
           <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <button onclick="analyzeFOC()" id="foc-analyze-btn" style="padding:10px 16px;background:#162a35;border:1px solid #2a6f8a;color:white;border:none;border-radius:8px;font-weight:600;font-family:inherit;cursor:pointer;font-size:13px">🧠 Run Analysis</button>
+            <button onclick="analyzeFOC()" id="foc-analyze-btn" style="padding:10px 16px;background:#0066cc;border:1px solid #0066cc;color:white;border:none;border-radius:8px;font-weight:600;font-family:inherit;cursor:pointer;font-size:13px">🧠 Run Analysis</button>
             <button onclick="postFOCToDiscord()" id="foc-discord-btn" style="display:none;padding:10px 16px;background:#5865F2;color:white;border:none;border-radius:8px;font-weight:600;font-family:inherit;cursor:pointer;font-size:13px">📣 Post to Discord</button>
           </div>
         </div>
@@ -607,7 +607,7 @@
       <div class="card">
         <div class="defaults-title" style="font-size:11px;margin-bottom:10px">ALL AVAILABLE TITLES — <span id="foc-count"></span></div>
         <div style="margin-bottom:8px">
-          <input type="text" id="foc-search" placeholder="Search titles..." oninput="filterFOC()" style="width:100%;padding:8px 10px;border:1px solid #1e2530;border-radius:8px;font-family:inherit;font-size:13px;box-sizing:border-box" />
+          <input type="text" id="foc-search" placeholder="Search titles..." oninput="filterFOC()" style="width:100%;padding:8px 10px;border:1px solid #dee2e6;border-radius:8px;font-family:inherit;font-size:13px;box-sizing:border-box" />
         </div>
         <div id="foc-list" style="font-size:13px;max-height:500px;overflow-y:auto"></div>
       </div>
@@ -694,16 +694,16 @@
 
   <!-- INVENTORY -->
   <div class="panel" id="panel-inventory">
-    <div style="background:#0f1318;border:1px solid #1e2530;border-radius:12px;padding:12px 14px;margin-bottom:0.75rem">
+    <div style="background:#ffffff;border:1px solid #dee2e6;border-radius:12px;padding:12px 14px;margin-bottom:0.75rem">
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px">
-        <div style="font-size:13px;font-weight:600;color:#e8edf2">🧠 Oracle</div>
-        <button onclick="fireAgent1()" style="padding:7px 12px;background:#162a35;border:1px solid #2a6f8a;color:white;border:none;border-radius:8px;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer">Monday FOC Briefing</button>
+        <div style="font-size:13px;font-weight:600;color:#212529">🧠 Oracle</div>
+        <button onclick="fireAgent1()" style="padding:7px 12px;background:#0066cc;border:1px solid #0066cc;color:white;border:none;border-radius:8px;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer">Monday FOC Briefing</button>
       </div>
       <div class="status" id="agent1-status" style="display:none"></div>
       <div style="border-top:1px solid #f0f0ea;margin-top:8px;padding-top:8px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
-        <div style="font-size:13px;font-weight:600;color:#e8edf2">🤖 The Watcher — Inventory Analyst</div>
+        <div style="font-size:13px;font-weight:600;color:#212529">🤖 The Watcher — Inventory Analyst</div>
         <div style="display:flex;gap:8px">
-          <button onclick="fireAgent3('daily')" style="padding:7px 12px;background:#0d1f35;border:1px solid #2a6f8a;color:white;border:none;border-radius:8px;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer">Daily Digest</button>
+          <button onclick="fireAgent3('daily')" style="padding:7px 12px;background:#0066cc;border:1px solid #0066cc;color:white;border:none;border-radius:8px;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer">Daily Digest</button>
           <button onclick="fireAgent3('weekly')" style="padding:7px 12px;background:#7B3FB5;color:white;border:none;border-radius:8px;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer">Weekly Report</button>
         </div>
       </div>
@@ -711,7 +711,7 @@
     </div>
     <div class="card" style="margin-bottom:0.75rem">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-        <div style="font-size:13px;font-weight:600;color:#e8edf2">💰 Cash Position</div>
+        <div style="font-size:13px;font-weight:600;color:#212529">💰 Cash Position</div>
         <button onclick="toggleCashUpdate()" style="font-size:12px;color:#5bc8f5;background:none;border:none;cursor:pointer;font-weight:600">Update</button>
       </div>
       <div id="cash-display" style="display:flex;gap:16px;flex-wrap:wrap;font-size:13px">
@@ -743,8 +743,8 @@
       <div class="stat-card"><div class="stat-label">Unlisted</div><div class="stat-value" id="stat-unlisted">—</div></div>
     </div>
     <div class="search-bar"><input type="text" id="search-input" placeholder="Search series, publisher, location..." oninput="filterInventory()" /></div>
-    <div id="fields-debug" style="display:none;background:#0a0c10;padding:12px;border-radius:8px;font-size:12px;margin-bottom:1rem;font-family:monospace;"></div>
-    <button onclick="loadFieldNames()" style="font-size:11px;padding:4px 8px;background:#0a0c10;border:1px solid #1e2530;border-radius:6px;cursor:pointer;margin-bottom:1rem;">Show Airtable Field Names</button>
+    <div id="fields-debug" style="display:none;background:#f8f9fa;padding:12px;border-radius:8px;font-size:12px;margin-bottom:1rem;font-family:monospace;"></div>
+    <button onclick="loadFieldNames()" style="font-size:11px;padding:4px 8px;background:#f8f9fa;border:1px solid #dee2e6;border-radius:6px;cursor:pointer;margin-bottom:1rem;">Show Airtable Field Names</button>
     <div class="inventory-list" id="inventory-list"><div class="empty">Loading inventory...</div></div>
     <div class="status" id="inv-status"></div>
   </div>
@@ -752,11 +752,11 @@
   <!-- PC SELECTION -->
   <div class="panel" id="panel-pc">
     <div class="card">
-      <div class="defaults-title" style="font-size:13px;font-weight:600;color:#e8edf2;margin-bottom:1rem">Personal Collection Selection</div>
+      <div class="defaults-title" style="font-size:13px;font-weight:600;color:#212529;margin-bottom:1rem">Personal Collection Selection</div>
       <p style="font-size:13px;color:#666;margin-bottom:1rem">Enter an invoice number to see all comics from that order. Tap <strong style="color:#5bc8f5">For Sale</strong>, <strong style="color:#5bc8f5">Kyle</strong>, or <strong style="color:#7B3FB5">Justin</strong> for each copy.</p>
       <div style="display:flex;gap:8px;margin-bottom:1rem">
-        <input type="text" id="pc-invoice-input" placeholder="Invoice number e.g. 827969" style="flex:1;padding:10px;border:1px solid #1e2530;border-radius:8px;font-family:inherit;font-size:14px" />
-        <button onclick="loadPCInvoice()" style="padding:10px 16px;background:#162a35;border:1px solid #2a6f8a;color:white;border:none;border-radius:8px;font-weight:600;font-family:inherit;cursor:pointer;white-space:nowrap">Load</button>
+        <input type="text" id="pc-invoice-input" placeholder="Invoice number e.g. 827969" style="flex:1;padding:10px;border:1px solid #dee2e6;border-radius:8px;font-family:inherit;font-size:14px" />
+        <button onclick="loadPCInvoice()" style="padding:10px 16px;background:#0066cc;border:1px solid #0066cc;color:white;border:none;border-radius:8px;font-weight:600;font-family:inherit;cursor:pointer;white-space:nowrap">Load</button>
       </div>
       <div class="status" id="pc-status"></div>
     </div>
@@ -775,7 +775,7 @@
   <!-- BUNDLES -->
   <div class="panel" id="panel-bundles">
     <div class="card">
-      <div class="defaults-title" style="font-size:13px;font-weight:600;color:#e8edf2;margin-bottom:4px">📦 Bundle Planner</div>
+      <div class="defaults-title" style="font-size:13px;font-weight:600;color:#212529;margin-bottom:4px">📦 Bundle Planner</div>
       <p style="font-size:13px;color:#666;margin-bottom:12px">Plan eBay bundles, Whatnot singles, and solo listings. Load an invoice to see what you ordered and plan how to sell it.</p>
       <div class="row">
         <div class="field">
@@ -803,7 +803,7 @@
 
   <div class="panel" id="panel-update">
     <div class="card">
-      <div class="defaults-title" style="font-size:13px;font-weight:600;color:#e8edf2;margin-bottom:1rem">Find & Update Record</div>
+      <div class="defaults-title" style="font-size:13px;font-weight:600;color:#212529;margin-bottom:1rem">Find & Update Record</div>
       <div class="field">
         <label>Search by SKU, Series, or Title</label>
         <input type="text" id="update-search" placeholder="e.g. COM-00001 or Web of Venom" oninput="searchToUpdate()" />
@@ -814,15 +814,15 @@
     <div class="card" id="update-form-card" style="display:none">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
         <div>
-          <strong id="update-record-title" style="font-size:15px;color:#e8edf2"></strong>
-          <div id="update-record-sku" style="font-size:12px;color:#5a6a7a;margin-top:2px"></div>
+          <strong id="update-record-title" style="font-size:15px;color:#212529"></strong>
+          <div id="update-record-sku" style="font-size:12px;color:#6c757d;margin-top:2px"></div>
         </div>
-        <button onclick="closeUpdateForm()" style="background:none;border:none;font-size:18px;cursor:pointer;color:#5a6a7a">✕</button>
+        <button onclick="closeUpdateForm()" style="background:none;border:none;font-size:18px;cursor:pointer;color:#6c757d">✕</button>
       </div>
 
       <div class="defaults-title" style="font-size:11px;margin-bottom:10px">UPDATE STATUS</div>
       <div class="row" style="margin-bottom:1rem">
-        <select id="update-status" style="flex:1;padding:10px;border:1px solid #1e2530;border-radius:8px;font-family:inherit;font-size:14px">
+        <select id="update-status" style="flex:1;padding:10px;border:1px solid #dee2e6;border-radius:8px;font-family:inherit;font-size:14px">
           <option value="">— keep current —</option>
           <option value="Ordered">Ordered</option>
           <option value="In Stock">In Stock</option>
@@ -880,13 +880,13 @@
   <!-- EBAY SALES IMPORT -->
   <div class="panel" id="panel-ebay">
     <div class="card">
-      <div class="defaults-title" style="font-size:13px;font-weight:600;color:#e8edf2;margin-bottom:0.5rem">Import eBay Sales History</div>
+      <div class="defaults-title" style="font-size:13px;font-weight:600;color:#212529;margin-bottom:0.5rem">Import eBay Sales History</div>
       <p style="font-size:13px;color:#666;margin-bottom:1rem">Upload your eBay orders report CSV. The Watcher will use this data for margin analysis and sales intelligence.</p>
       <div class="drop-zone" id="ebay-drop-zone" onclick="document.getElementById('ebay-file').click()"
         ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleEbayDrop(event)">
         <div style="font-size:32px;margin-bottom:8px">📊</div>
         <strong>Drop eBay Orders Report CSV here</strong>
-        <p style="color:#5a6a7a;font-size:13px">eBay-OrdersReport-*.csv from Seller Hub</p>
+        <p style="color:#6c757d;font-size:13px">eBay-OrdersReport-*.csv from Seller Hub</p>
         <input type="file" id="ebay-file" accept=".csv" style="display:none" onchange="handleEbayFile(event)" />
       </div>
       <div class="status" id="ebay-status"></div>
@@ -924,7 +924,7 @@
       <div class="field">
         <label>Search by SKU, Series, or Bundle ID (min 2 chars)</label>
         <input type="text" id="sell-search" placeholder="e.g. MASK, COM-00535, or bundle ID..." oninput="searchToSell()" 
-          style="color:#e8edf2;background:#0f1318;border:1px solid #1e2530;padding:10px;border-radius:8px;width:100%;box-sizing:border-box;font-size:14px" />
+          style="color:#212529;background:#ffffff;border:1px solid #dee2e6;padding:10px;border-radius:8px;width:100%;box-sizing:border-box;font-size:14px" />
       </div>
       <div id="sell-results" class="inventory-list"></div>
     </div>
@@ -936,7 +936,7 @@
       <!-- Selected items -->
       <div id="sell-bundle-items" style="display:none;margin-bottom:12px">
         <div style="font-size:11px;font-weight:700;color:#5bc8f5;margin-bottom:6px">BUNDLE ITEMS</div>
-        <div id="sell-bundle-list" style="font-size:12px;color:#7a8a9a;max-height:120px;overflow-y:auto"></div>
+        <div id="sell-bundle-list" style="font-size:12px;color:#6c757d;max-height:120px;overflow-y:auto"></div>
       </div>
 
       <!-- Sale details -->
@@ -986,15 +986,15 @@
 
   <!-- PHOTO UPLOAD MODAL -->
   <div id="photo-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:1000;overflow-y:auto">
-    <div style="max-width:680px;margin:20px auto;background:#0f1318;border-radius:16px;padding:24px;position:relative">
+    <div style="max-width:680px;margin:20px auto;background:#ffffff;border-radius:16px;padding:24px;position:relative">
       
       <!-- Header -->
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
         <div>
-          <div style="font-size:16px;font-weight:700;color:#e8edf2">📷 Add Photos & Publish</div>
-          <div id="photo-modal-subtitle" style="font-size:12px;color:#5a6a7a;margin-top:2px"></div>
+          <div style="font-size:16px;font-weight:700;color:#212529">📷 Add Photos & Publish</div>
+          <div id="photo-modal-subtitle" style="font-size:12px;color:#6c757d;margin-top:2px"></div>
         </div>
-        <button onclick="closePhotoModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#5a6a7a;padding:4px">✕</button>
+        <button onclick="closePhotoModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#6c757d;padding:4px">✕</button>
       </div>
 
       <!-- Draft summary -->
@@ -1002,15 +1002,15 @@
 
       <!-- Extra context field -->
       <div style="margin-bottom:16px">
-        <label style="font-size:12px;font-weight:600;color:#7a8a9a;display:block;margin-bottom:4px">Additional Context (key issues, first appearances, connecting covers, etc.)</label>
-        <textarea id="photo-extra-context" placeholder="e.g. CVR E+F are connecting Energon Universe anniversary covers. CVR G is 1:25 Kael Ngu ratio variant." style="width:100%;height:70px;border:1px solid #1e2530;border-radius:8px;padding:8px;font-size:12px;font-family:inherit;resize:vertical;box-sizing:border-box"></textarea>
+        <label style="font-size:12px;font-weight:600;color:#6c757d;display:block;margin-bottom:4px">Additional Context (key issues, first appearances, connecting covers, etc.)</label>
+        <textarea id="photo-extra-context" placeholder="e.g. CVR E+F are connecting Energon Universe anniversary covers. CVR G is 1:25 Kael Ngu ratio variant." style="width:100%;height:70px;border:1px solid #dee2e6;border-radius:8px;padding:8px;font-size:12px;font-family:inherit;resize:vertical;box-sizing:border-box"></textarea>
       </div>
 
       <!-- Photo upload grid -->
       <div style="margin-bottom:16px">
-        <label style="font-size:12px;font-weight:600;color:#7a8a9a;display:block;margin-bottom:8px">Cover Photos <span style="font-weight:400;color:#5a6a7a">(upload each cover individually — app builds the collage)</span></label>
+        <label style="font-size:12px;font-weight:600;color:#6c757d;display:block;margin-bottom:8px">Cover Photos <span style="font-weight:400;color:#6c757d">(upload each cover individually — app builds the collage)</span></label>
         <div id="photo-upload-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:8px"></div>
-        <button onclick="document.getElementById('photo-file-input').click()" style="width:100%;padding:10px;background:#f5f5f0;border:2px dashed #d0d0cc;border-radius:8px;font-size:12px;color:#5a6a7a;cursor:pointer;font-family:inherit">
+        <button onclick="document.getElementById('photo-file-input').click()" style="width:100%;padding:10px;background:#f5f5f0;border:2px dashed #d0d0cc;border-radius:8px;font-size:12px;color:#6c757d;cursor:pointer;font-family:inherit">
           + Add Photos (select multiple)
         </button>
         <input type="file" id="photo-file-input" accept="image/*,.heic,.heif" multiple style="display:none" onchange="handlePhotoUpload(this)">
@@ -1019,18 +1019,18 @@
       <!-- Collage preview -->
       <div id="collage-preview-section" style="display:none;margin-bottom:16px">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-          <label style="font-size:12px;font-weight:600;color:#7a8a9a">Collage Preview</label>
+          <label style="font-size:12px;font-weight:600;color:#6c757d">Collage Preview</label>
           <button onclick="regenerateCollage()" style="font-size:11px;color:#5bc8f5;background:none;border:none;cursor:pointer;font-family:inherit">↻ Regenerate</button>
         </div>
-        <canvas id="collage-canvas" style="width:100%;border-radius:8px;border:1px solid #1e2530"></canvas>
+        <canvas id="collage-canvas" style="width:100%;border-radius:8px;border:1px solid #dee2e6"></canvas>
       </div>
 
       <!-- Actions -->
       <div style="display:flex;gap:8px">
-        <button onclick="publishToEbay()" id="publish-btn" style="flex:1;padding:12px;background:#0d1f35;border:1px solid #2a6f8a;color:white;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">
+        <button onclick="publishToEbay()" id="publish-btn" style="flex:1;padding:12px;background:#0066cc;border:1px solid #0066cc;color:white;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">
           🚀 Publish to eBay as Draft
         </button>
-        <button onclick="downloadCollage()" id="download-btn" style="display:none;padding:12px;background:#162a35;border:1px solid #2a6f8a;color:white;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">
+        <button onclick="downloadCollage()" id="download-btn" style="display:none;padding:12px;background:#0066cc;border:1px solid #0066cc;color:white;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">
           ⬇ Save Collage
         </button>
       </div>
@@ -1042,17 +1042,17 @@
   <div class="panel" id="panel-agents">
     <!-- Agent selector tabs -->
     <div style="display:flex;gap:6px;margin-bottom:12px;overflow-x:auto">
-      <button onclick="loadAgentLog('1')" id="agent-btn-1" style="padding:8px 16px;background:#162a35;border:1px solid #2a6f8a;color:white;border:none;border-radius:8px;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer;white-space:nowrap;flex-shrink:0">🧠 Oracle</button>
-      <button onclick="loadAgentLog('2')" id="agent-btn-2" style="padding:8px 16px;background:#e5e5e0;color:#7a8a9a;border:none;border-radius:8px;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer;white-space:nowrap;flex-shrink:0">🛒 Taskmaster</button>
-      <button onclick="loadAgentLog('3')" id="agent-btn-3" style="padding:8px 16px;background:#e5e5e0;color:#7a8a9a;border:none;border-radius:8px;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer;white-space:nowrap;flex-shrink:0">📊 The Watcher</button>
-      <button onclick="loadAgentLog(currentAgentTab)" style="padding:8px 12px;background:#0f1318;color:#5a6a7a;border:1px solid #1e2530;border-radius:8px;font-size:12px;font-family:inherit;cursor:pointer;flex-shrink:0">↻ Refresh</button>
+      <button onclick="loadAgentLog('1')" id="agent-btn-1" style="padding:8px 16px;background:#0066cc;border:1px solid #0066cc;color:white;border:none;border-radius:8px;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer;white-space:nowrap;flex-shrink:0">🧠 Oracle</button>
+      <button onclick="loadAgentLog('2')" id="agent-btn-2" style="padding:8px 16px;background:#e5e5e0;color:#6c757d;border:none;border-radius:8px;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer;white-space:nowrap;flex-shrink:0">🛒 Taskmaster</button>
+      <button onclick="loadAgentLog('3')" id="agent-btn-3" style="padding:8px 16px;background:#e5e5e0;color:#6c757d;border:none;border-radius:8px;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer;white-space:nowrap;flex-shrink:0">📊 The Watcher</button>
+      <button onclick="loadAgentLog(currentAgentTab)" style="padding:8px 12px;background:#ffffff;color:#6c757d;border:1px solid #dee2e6;border-radius:8px;font-size:12px;font-family:inherit;cursor:pointer;flex-shrink:0">↻ Refresh</button>
       <button onclick="clearAllDrafts()" style="padding:8px 12px;background:#fef2f2;color:#E24B4A;border:1px solid #fecaca;border-radius:8px;font-size:12px;font-family:inherit;cursor:pointer;flex-shrink:0">🗑 Clear All</button>
     </div>
 
     <!-- Feed header -->
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-      <div id="agent-feed-title" style="font-size:13px;font-weight:700;color:#e8edf2"></div>
-      <div id="agent-feed-count" style="font-size:11px;color:#5a6a7a"></div>
+      <div id="agent-feed-title" style="font-size:13px;font-weight:700;color:#212529"></div>
+      <div id="agent-feed-count" style="font-size:11px;color:#6c757d"></div>
     </div>
 
     <div class="status" id="agent-log-status"></div>
@@ -2463,12 +2463,12 @@ function renderFOCList(items) {
     return `<div style="padding:8px 0;border-bottom:1px solid #f0f0ea;display:flex;align-items:center;gap:8px">
       <div style="flex:1;min-width:0">
         <div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${item.title}">${item.title}</div>
-        <div style="font-size:11px;color:#5a6a7a;margin-top:2px">${item.publisher} · $${item.retail.toFixed(2)} · ${item.inStore || item.foc}</div>
+        <div style="font-size:11px;color:#6c757d;margin-top:2px">${item.publisher} · $${item.retail.toFixed(2)} · ${item.inStore || item.foc}</div>
       </div>
       <div style="display:flex;gap:4px;align-items:center;flex-shrink:0">
         ${ratioTag}${catTag}
         <input type="number" min="0" max="99" value="${item.qty}" 
-          style="width:48px;padding:4px;border:1px solid #1e2530;border-radius:6px;text-align:center;font-size:12px;font-family:inherit"
+          style="width:48px;padding:4px;border:1px solid #dee2e6;border-radius:6px;text-align:center;font-size:12px;font-family:inherit"
           onchange="focItems[${idx}].qty = parseInt(this.value)||0"
           placeholder="0" />
       </div>
@@ -2587,14 +2587,14 @@ function renderFOCSignals(signals, totalCost, totalReturn, focBudget) {
     <div style="background:${bg};border-left:3px solid ${color};border-radius:8px;padding:10px 12px;margin-bottom:8px">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
         <div style="flex:1">
-          <div style="font-size:12px;font-weight:700;color:#e8edf2">${s.title}</div>
-          <div style="font-size:12px;color:#7a8a9a;margin-top:3px">${s.reason}</div>
-          ${s.strategy ? `<div style="font-size:11px;color:#5a6a7a;margin-top:2px">${s.strategy}${s.qty ? ` · ${s.qty} copies` : ''}</div>` : ''}
+          <div style="font-size:12px;font-weight:700;color:#212529">${s.title}</div>
+          <div style="font-size:12px;color:#6c757d;margin-top:3px">${s.reason}</div>
+          ${s.strategy ? `<div style="font-size:11px;color:#6c757d;margin-top:2px">${s.strategy}${s.qty ? ` · ${s.qty} copies` : ''}</div>` : ''}
         </div>
         ${s.cost ? `<div style="text-align:right;flex-shrink:0">
-          <div style="font-size:11px;color:#5a6a7a">Cost</div>
+          <div style="font-size:11px;color:#6c757d">Cost</div>
           <div style="font-size:13px;font-weight:700;color:${color}">$${parseFloat(s.cost).toFixed(2)}</div>
-          ${s.expectedReturn ? `<div style="font-size:11px;color:#5a6a7a">→ $${parseFloat(s.expectedReturn).toFixed(2)}</div>` : ''}
+          ${s.expectedReturn ? `<div style="font-size:11px;color:#6c757d">→ $${parseFloat(s.expectedReturn).toFixed(2)}</div>` : ''}
         </div>` : ''}
       </div>
     </div>`;
@@ -2752,7 +2752,7 @@ function showEbaySummary(sales) {
     <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f0f0ea">
       <div style="flex:1;min-width:0">
         <div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${s.title || '—'}</div>
-        <div style="font-size:11px;color:#5a6a7a">${s.saleDate} · ${s.isBundle ? '📦 Bundle' : '📖 Single'}</div>
+        <div style="font-size:11px;color:#6c757d">${s.saleDate} · ${s.isBundle ? '📦 Bundle' : '📖 Single'}</div>
       </div>
       <div style="font-size:14px;font-weight:700;color:#5bc8f5;margin-left:10px;flex-shrink:0">$${s.salePrice.toFixed(2)}</div>
     </div>
@@ -2821,7 +2821,7 @@ function openPhotoModal(draft) {
     '<span style="color:#5bc8f5;font-weight:600">$' + (d.price || '') + ' free shipping</span>' +
     ' | Break-even: $' + (d.breakEven || '') +
     ' | Margin: $' + (d.margin || '') +
-    '<br><span style="color:#7a8a9a;font-style:italic">' + (d.description || '') + '</span>';
+    '<br><span style="color:#6c757d;font-style:italic">' + (d.description || '') + '</span>';
 
   document.getElementById('photo-modal').style.display = 'block';
   document.body.style.overflow = 'hidden';
@@ -3157,7 +3157,7 @@ async function loadAgentLog(agentNum) {
     document.getElementById('agent-log-status').style.display = 'none';
 
     if (!agentRecords.length) {
-      list.innerHTML = '<div style="padding:30px;text-align:center;color:#5a6a7a;font-size:13px"><div style="font-size:32px;margin-bottom:8px">📭</div><div>No activity logged yet</div><div style="font-size:11px;margin-top:4px">Fire a briefing from the Inventory tab</div></div>';
+      list.innerHTML = '<div style="padding:30px;text-align:center;color:#6c757d;font-size:13px"><div style="font-size:32px;margin-bottom:8px">📭</div><div>No activity logged yet</div><div style="font-size:11px;margin-top:4px">Fire a briefing from the Inventory tab</div></div>';
       return;
     }
 
@@ -3188,17 +3188,17 @@ async function loadAgentLog(agentNum) {
             const estReturn = parseFloat(f['Estimated Return'] || draft.price || 0);
             draftCard = '<div style="background:#F0F5FF;border:1px solid #185FA5;border-radius:8px;padding:10px;margin-top:6px">' +
               '<div style="font-size:11px;font-weight:700;color:#5bc8f5;margin-bottom:6px">⚔️ TASKMASTER DRAFT</div>' +
-              '<div style="font-size:13px;font-weight:700;color:#e8edf2;margin-bottom:4px">' + (draft.title || '') + '</div>' +
+              '<div style="font-size:13px;font-weight:700;color:#212529;margin-bottom:4px">' + (draft.title || '') + '</div>' +
               '<div style="display:flex;gap:16px;font-size:12px;margin-bottom:6px">' +
               '<span>Price: <strong style="color:#5bc8f5">$' + (draft.price || '—') + ' free shipping</strong></span>' +
               '<span>Break-even: $' + (draft.breakEven || '—') + '</span>' +
               '<span>Margin: $' + (draft.margin || '—') + '</span>' +
               '</div>' +
-              (draft.description ? '<div style="font-size:12px;color:#7a8a9a;margin-bottom:6px">' + draft.description + '</div>' : '') +
-              (draft.reasoning ? '<div style="font-size:11px;color:#5a6a7a;font-style:italic">' + draft.reasoning + '</div>' : '') +
+              (draft.description ? '<div style="font-size:12px;color:#6c757d;margin-bottom:6px">' + draft.description + '</div>' : '') +
+              (draft.reasoning ? '<div style="font-size:11px;color:#6c757d;font-style:italic">' + draft.reasoning + '</div>' : '') +
               '<div style="margin-top:8px;display:flex;gap:6px">' +
-              '<button onclick="openPhotoModalById(\''+r.id+'\')" style="padding:6px 12px;background:#162a35;border:1px solid #2a6f8a;color:white;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit">📷 Add Photos & Publish</button>' +
-              '<button style="padding:6px 12px;background:#e5e5e0;color:#7a8a9a;border:none;border-radius:6px;font-size:11px;cursor:pointer">✏️ Edit Draft</button>' +
+              '<button onclick="openPhotoModalById(\''+r.id+'\')" style="padding:6px 12px;background:#0066cc;border:1px solid #0066cc;color:white;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit">📷 Add Photos & Publish</button>' +
+              '<button style="padding:6px 12px;background:#e5e5e0;color:#6c757d;border:none;border-radius:6px;font-size:11px;cursor:pointer">✏️ Edit Draft</button>' +
               '<button onclick="deleteDraftRecord(\''+r.id+'\')" style="padding:6px 12px;background:#fef2f2;color:#E24B4A;border:1px solid #fecaca;border-radius:6px;font-size:11px;cursor:pointer">🗑 Delete</button>' +
               '</div>' +
               '</div>';
@@ -3206,18 +3206,18 @@ async function loadAgentLog(agentNum) {
         } catch(e) {}
       }
 
-      const bodyText = draftCard || (reasoning ? '<div style="font-size:12px;color:#444;line-height:1.5;white-space:pre-wrap;background:#0f1318;border-radius:6px;padding:8px;margin-bottom:6px;max-height:300px;overflow-y:auto">' + reasoning + '</div>' : '');
+      const bodyText = draftCard || (reasoning ? '<div style="font-size:12px;color:#444;line-height:1.5;white-space:pre-wrap;background:#ffffff;border-radius:6px;padding:8px;margin-bottom:6px;max-height:300px;overflow-y:auto">' + reasoning + '</div>' : '');
 
-      return '<div style="border:1px solid #1e2530;border-radius:10px;padding:12px;margin-bottom:10px">' +
+      return '<div style="border:1px solid #dee2e6;border-radius:10px;padding:12px;margin-bottom:10px">' +
         '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">' +
         '<div><div style="font-size:13px;font-weight:700">' + title + '</div>' +
-        '<div style="font-size:11px;color:#5a6a7a;margin-top:2px">' + date + '</div></div>' +
+        '<div style="font-size:11px;color:#6c757d;margin-top:2px">' + date + '</div></div>' +
         '<div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end">' +
         (signal ? '<span style="background:#E8F8F3;color:#5bc8f5;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">' + signal + '</span>' : '') +
         (outcome ? '<span style="background:' + outcomeColor + '22;color:' + outcomeColor + ';padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">' + outcome + '</span>' : '') +
         '</div></div>' +
         bodyText +
-        ((profit || days) ? '<div style="font-size:11px;color:#5a6a7a;display:flex;gap:12px;margin-top:4px">' +
+        ((profit || days) ? '<div style="font-size:11px;color:#6c757d;display:flex;gap:12px;margin-top:4px">' +
           (profit ? '<span>Profit: <strong style="color:' + (parseFloat(profit)>=0?'#1D9E75':'#E24B4A') + '">$' + parseFloat(profit).toFixed(2) + '</strong></span>' : '') +
           (days ? '<span>Days: <strong>' + days + '</strong></span>' : '') +
           '</div>' : '') +
@@ -3227,7 +3227,7 @@ async function loadAgentLog(agentNum) {
     let html = active.map(card).join('');
     if (archived.length) {
       html += '<div style="margin-top:16px;padding-top:12px;border-top:1px solid #e5e5e0">' +
-        '<div style="font-size:11px;font-weight:700;color:#5a6a7a;margin-bottom:10px">📁 ARCHIVED (older than 7 days)</div>' +
+        '<div style="font-size:11px;font-weight:700;color:#6c757d;margin-bottom:10px">📁 ARCHIVED (older than 7 days)</div>' +
         archived.map(card).join('') + '</div>';
     }
     list.innerHTML = html;
@@ -3402,7 +3402,7 @@ function renderBundlePlanner(bySeries, total, forSale) {
 
   const assignOptions = (skuId, current) => `
     <select onchange="updateSkuAssignment('${skuId}', this.value)" 
-      style="padding:4px 6px;border:1px solid #1e2530;border-radius:6px;font-size:11px;font-family:inherit;background:#0f1318">
+      style="padding:4px 6px;border:1px solid #dee2e6;border-radius:6px;font-size:11px;font-family:inherit;background:#ffffff">
       <option value="B1" ${current==='B1'?'selected':''}>Bundle 1 ⭐</option>
       <option value="B2" ${current==='B2'?'selected':''}>Bundle 2</option>
       <option value="B3" ${current==='B3'?'selected':''}>Bundle 3</option>
@@ -3424,13 +3424,13 @@ function renderBundlePlanner(bySeries, total, forSale) {
       const skus = g.variants[v];
       return skus.map((s, idx) => `
         <div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid #f8f8f8">
-          <div style="width:55px;font-size:11px;font-weight:600;color:#e8edf2;flex-shrink:0">
+          <div style="width:55px;font-size:11px;font-weight:600;color:#212529;flex-shrink:0">
             CVR ${v}${skus.length > 1 ? ` #${idx+1}` : ''}
           </div>
-          <div style="font-size:10px;color:#5a6a7a;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+          <div style="font-size:10px;color:#6c757d;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
             ${s.variantDesc || ''}${s.isRatio ? ' ⭐' : ''}
           </div>
-          <div style="font-size:10px;color:#5a6a7a;flex-shrink:0">$${s.purchasePrice.toFixed(2)}</div>
+          <div style="font-size:10px;color:#6c757d;flex-shrink:0">$${s.purchasePrice.toFixed(2)}</div>
           ${assignOptions(s.id, s.assignment)}
         </div>`).join('');
     }).join('');
@@ -3441,7 +3441,7 @@ function renderBundlePlanner(bySeries, total, forSale) {
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
           <span style="font-size:12px">All ${g.blindBags.length} →</span>
           <select onchange="updateAllBlindBags('${key}', this.value)"
-            style="padding:4px 6px;border:1px solid #1e2530;border-radius:6px;font-size:11px;font-family:inherit">
+            style="padding:4px 6px;border:1px solid #dee2e6;border-radius:6px;font-size:11px;font-family:inherit">
             <option value="whatnot">Whatnot</option>
             <option value="single-ebay">eBay Single</option>
             <option value="B1">Bundle 1</option>
@@ -3462,7 +3462,7 @@ function renderBundlePlanner(bySeries, total, forSale) {
             ${g.blindBags.length ? `<span style="background:#FFF3E0;color:#E65100;padding:2px 7px;border-radius:10px;margin-left:4px">🎁 ${g.blindBags.length} blind bags</span>` : ''}
           </div>
         </div>
-        <div style="font-size:12px;color:#5a6a7a;text-align:right">
+        <div style="font-size:12px;color:#6c757d;text-align:right">
           ${nonBlind.length} variants<br>Cost: $${totalCost.toFixed(2)}
         </div>
       </div>
@@ -3491,19 +3491,19 @@ function renderBundlePlanner(bySeries, total, forSale) {
       const richCoverDesc = g.skus.map(s => 'CVR ' + s.variant + (s.variantDesc ? ' (' + s.variantDesc + ')' : '')).join(', ');
       window._bundleData[safeKey] = { bundleKey: key, series: g.series, issue: g.issue||'', publisher: g.publisher||'', coverStr, richCoverDesc, costBasis, ratioStr: ratioStr||'' };
       const draftBtn = '<div style="margin-top:8px;padding:8px;background:#f5f5f0;border-radius:8px;font-size:12px">' +
-        '<div style="font-weight:600;margin-bottom:6px;color:#7a8a9a">Ratio Variants:</div>' +
+        '<div style="font-weight:600;margin-bottom:6px;color:#6c757d">Ratio Variants:</div>' +
         '<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px">' +
         '<label style="display:flex;align-items:center;gap:4px;cursor:pointer"><input type="checkbox" id="ratio-'+safeKey+'-10" value="1:10"> 1:10</label>' +
         '<label style="display:flex;align-items:center;gap:4px;cursor:pointer"><input type="checkbox" id="ratio-'+safeKey+'-25" value="1:25"> 1:25</label>' +
         '<label style="display:flex;align-items:center;gap:4px;cursor:pointer"><input type="checkbox" id="ratio-'+safeKey+'-50" value="1:50"> 1:50</label>' +
         '<label style="display:flex;align-items:center;gap:4px;cursor:pointer"><input type="checkbox" id="ratio-'+safeKey+'-100" value="1:100"> 1:100</label>' +
         '</div>' +
-        '<div style="font-weight:600;margin-bottom:6px;color:#7a8a9a">Pricing Mode:</div>' +
+        '<div style="font-weight:600;margin-bottom:6px;color:#6c757d">Pricing Mode:</div>' +
         '<div style="display:flex;gap:12px;flex-wrap:wrap">' +
         '<label style="display:flex;align-items:center;gap:4px;cursor:pointer"><input type="radio" name="mode-'+safeKey+'" id="mode-'+safeKey+'-standard" value="standard" checked> Market Price ($1 under comp)</label>' +
         '<label style="display:flex;align-items:center;gap:4px;cursor:pointer"><input type="radio" name="mode-'+safeKey+'" id="mode-'+safeKey+'-cost" value="cost_plus"> Cover Costs +10%</label>' +
         '</div></div>' +
-        '<button onclick="agent2BuildDraftByKey(\''+safeKey+'\')" style="width:100%;margin-top:8px;padding:8px;background:#0d1f35;border:1px solid #2a6f8a;color:white;border:none;border-radius:8px;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer">⚔️ Taskmaster — Build Draft Listing</button>' +
+        '<button onclick="agent2BuildDraftByKey(\''+safeKey+'\')" style="width:100%;margin-top:8px;padding:8px;background:#0066cc;border:1px solid #0066cc;color:white;border:none;border-radius:8px;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer">⚔️ Taskmaster — Build Draft Listing</button>' +
         '<div id="draft-status-'+safeKey+'" style="margin-top:6px;font-size:12px"></div>';
       return buildCard(key) + draftBtn;
     }).join('');
@@ -3653,9 +3653,9 @@ async function agent2BuildDraft(bundleKey, series, issue, publisher, covers, cos
           <div style="font-weight:700;font-size:12px;margin-bottom:6px;color:#5bc8f5">⚔️ Draft Created by Taskmaster</div>
           <div style="font-size:13px;font-weight:600;margin-bottom:4px">${d.title || 'N/A'}</div>
           <div style="font-size:12px;margin-bottom:4px"><strong>Price:</strong> <span style="color:#5bc8f5">$${d.price || 'TBD'} + FREE shipping</span> | Break-even: $${d.breakEven || 'N/A'} | Margin: $${d.margin ? parseFloat(d.margin).toFixed(2) : 'N/A'}</div>
-          <div style="font-size:12px;color:#7a8a9a;margin-bottom:8px">${d.reasoning || ''}</div>
+          <div style="font-size:12px;color:#6c757d;margin-bottom:8px">${d.reasoning || ''}</div>
           <div style="display:flex;gap:6px">
-            <button onclick="finalizeDraft(this)" style="padding:6px 14px;background:#162a35;border:1px solid #2a6f8a;color:white;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit">✓ Save to Agents Tab</button>
+            <button onclick="finalizeDraft(this)" style="padding:6px 14px;background:#0066cc;border:1px solid #0066cc;color:white;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit">✓ Save to Agents Tab</button>
             <button onclick="this.closest('div').parentElement.parentElement.innerHTML=''" style="padding:6px 10px;background:#fef2f2;color:#E24B4A;border:1px solid #fecaca;border-radius:6px;font-size:11px;cursor:pointer;font-family:inherit">✕ Discard</button>
           </div>
         </div>`;
@@ -3710,7 +3710,7 @@ async function loadCashPosition() {
       if (f['Whatnot Transfer Date']) document.getElementById('cash-whatnot-date').value = f['Whatnot Transfer Date'];
     }
   } catch(e) {
-    document.getElementById('cash-display').innerHTML = '<span style="color:#5a6a7a">Could not load cash position</span>';
+    document.getElementById('cash-display').innerHTML = '<span style="color:#6c757d">Could not load cash position</span>';
   }
 }
 
@@ -3954,7 +3954,7 @@ checkPCDeepLink();
       <div style="display:flex;justify-content:space-between;align-items:center">
         <div>
           <strong>${series} #${issue}${variant ? ' (' + variant + ')' : ''}</strong>
-          <div style="font-size:12px;color:#5a6a7a;margin-top:2px">${sku} · ${status}</div>
+          <div style="font-size:12px;color:#6c757d;margin-top:2px">${sku} · ${status}</div>
         </div>
         <span style="font-size:12px;color:#5bc8f5;font-weight:600">Select →</span>
       </div>
@@ -4003,10 +4003,10 @@ function addServiceRow() {
   row.style.alignItems = 'center';
   row.innerHTML = `
     <div class="field" style="flex:2">
-      <input type="text" placeholder="Service name (e.g. Clean & Press)" style="width:100%;padding:10px;border:1px solid #1e2530;border-radius:8px;font-family:inherit;font-size:13px" class="svc-name" />
+      <input type="text" placeholder="Service name (e.g. Clean & Press)" style="width:100%;padding:10px;border:1px solid #dee2e6;border-radius:8px;font-family:inherit;font-size:13px" class="svc-name" />
     </div>
     <div class="field" style="flex:1">
-      <input type="number" placeholder="$0.00" step="0.01" min="0" style="width:100%;padding:10px;border:1px solid #1e2530;border-radius:8px;font-family:inherit;font-size:13px" class="svc-cost" />
+      <input type="number" placeholder="$0.00" step="0.01" min="0" style="width:100%;padding:10px;border:1px solid #dee2e6;border-radius:8px;font-family:inherit;font-size:13px" class="svc-cost" />
     </div>
     <button onclick="this.parentElement.remove()" style="background:none;border:none;color:#E24B4A;font-size:18px;cursor:pointer;padding:4px;flex-shrink:0">✕</button>
   `;
@@ -4204,7 +4204,7 @@ function searchToSell() {
     );
   });
 
-  if (!matches.length) { results.innerHTML = '<div style="padding:8px;color:#5a6a7a;font-size:13px">No results</div>'; return; }
+  if (!matches.length) { results.innerHTML = '<div style="padding:8px;color:#6c757d;font-size:13px">No results</div>'; return; }
 
   // Group by Bundle ID if present
   const bundles = {};
@@ -4226,10 +4226,10 @@ function searchToSell() {
     const items = bundles[bid];
     const costBasis = items.reduce((s, r) => s + (parseFloat(r.fields['Purchase Price']) || 0), 0);
     const bagBoard = items.reduce((s, r) => s + (parseFloat(r.fields['Bag Board']) || 0), 0);
-    html += `<button onclick="openBundleSell('${bid}')" style="width:100%;text-align:left;background:#0f1318;border:1px solid #1e2530;border-left:3px solid #1D9E75;border-radius:8px;padding:10px 12px;margin-bottom:6px;cursor:pointer;font-family:inherit">
-      <div style="font-size:13px;font-weight:600;color:#e8edf2">📦 Bundle: ${bid}</div>
-      <div style="font-size:11px;color:#5a6a7a;margin-top:2px">${items.length} items · Cost basis: $${(costBasis + bagBoard).toFixed(2)}</div>
-      <div style="font-size:11px;color:#7a8a9a;margin-top:2px">${items.map(r => 'CVR ' + (r.fields['Variant'] || '?')).join(', ')}</div>
+    html += `<button onclick="openBundleSell('${bid}')" style="width:100%;text-align:left;background:#ffffff;border:1px solid #dee2e6;border-left:3px solid #1D9E75;border-radius:8px;padding:10px 12px;margin-bottom:6px;cursor:pointer;font-family:inherit">
+      <div style="font-size:13px;font-weight:600;color:#212529">📦 Bundle: ${bid}</div>
+      <div style="font-size:11px;color:#6c757d;margin-top:2px">${items.length} items · Cost basis: $${(costBasis + bagBoard).toFixed(2)}</div>
+      <div style="font-size:11px;color:#6c757d;margin-top:2px">${items.map(r => 'CVR ' + (r.fields['Variant'] || '?')).join(', ')}</div>
     </button>`;
   });
 
@@ -4237,9 +4237,9 @@ function searchToSell() {
   singles.forEach(r => {
     const f = r.fields;
     const cost = (parseFloat(f['Purchase Price']) || 0) + (parseFloat(f['Bag Board']) || 0);
-    html += `<button onclick="openSingleSell('${r.id}')" style="width:100%;text-align:left;background:#0f1318;border:1px solid #1e2530;border-radius:8px;padding:10px 12px;margin-bottom:6px;cursor:pointer;font-family:inherit">
-      <div style="font-size:13px;font-weight:600;color:#e8edf2">${f['Series'] || ''} #${f['Issue'] || ''} CVR ${f['Variant'] || ''}</div>
-      <div style="font-size:11px;color:#5a6a7a;margin-top:2px">${f['SKU']} · Cost: $${cost.toFixed(2)} · ${f['Status']}</div>
+    html += `<button onclick="openSingleSell('${r.id}')" style="width:100%;text-align:left;background:#ffffff;border:1px solid #dee2e6;border-radius:8px;padding:10px 12px;margin-bottom:6px;cursor:pointer;font-family:inherit">
+      <div style="font-size:13px;font-weight:600;color:#212529">${f['Series'] || ''} #${f['Issue'] || ''} CVR ${f['Variant'] || ''}</div>
+      <div style="font-size:11px;color:#6c757d;margin-top:2px">${f['SKU']} · Cost: $${cost.toFixed(2)} · ${f['Status']}</div>
     </button>`;
   });
 
@@ -4318,18 +4318,18 @@ function updateProfitPreview() {
 
   document.getElementById('profit-breakdown').innerHTML = `
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">
-      <span style="color:#7a8a9a">Sale price:</span><span style="text-align:right;font-weight:600">$${salePrice.toFixed(2)}</span>
-      <span style="color:#7a8a9a">Cost basis:</span><span style="text-align:right;color:#E24B4A">-$${costBasis.toFixed(2)}</span>
-      <span style="color:#7a8a9a">Bag/board:</span><span style="text-align:right;color:#E24B4A">-$${bagBoard.toFixed(2)}</span>
-      <span style="color:#7a8a9a">Label cost:</span><span style="text-align:right;color:#E24B4A">-$${labelCost.toFixed(2)}</span>
-      <span style="color:#7a8a9a">Supplies:</span><span style="text-align:right;color:#E24B4A">-$${shippingCost.toFixed(2)}</span>
-      <span style="color:#7a8a9a">${platform} fee (${Math.round(feeRate*100)}%):</span><span style="text-align:right;color:#E24B4A">-$${platformFee.toFixed(2)}</span>
+      <span style="color:#6c757d">Sale price:</span><span style="text-align:right;font-weight:600">$${salePrice.toFixed(2)}</span>
+      <span style="color:#6c757d">Cost basis:</span><span style="text-align:right;color:#E24B4A">-$${costBasis.toFixed(2)}</span>
+      <span style="color:#6c757d">Bag/board:</span><span style="text-align:right;color:#E24B4A">-$${bagBoard.toFixed(2)}</span>
+      <span style="color:#6c757d">Label cost:</span><span style="text-align:right;color:#E24B4A">-$${labelCost.toFixed(2)}</span>
+      <span style="color:#6c757d">Supplies:</span><span style="text-align:right;color:#E24B4A">-$${shippingCost.toFixed(2)}</span>
+      <span style="color:#6c757d">${platform} fee (${Math.round(feeRate*100)}%):</span><span style="text-align:right;color:#E24B4A">-$${platformFee.toFixed(2)}</span>
       <span style="font-weight:700;border-top:1px solid #ddd;padding-top:4px">Net profit:</span>
       <span style="text-align:right;font-weight:700;border-top:1px solid #ddd;padding-top:4px;color:${profit >= 0 ? '#1D9E75' : '#E24B4A'}">
         ${profit >= 0 ? '+' : ''}$${profit.toFixed(2)} (${margin}%)
       </span>
     </div>
-    ${daysListed !== null ? `<div style="margin-top:6px;color:#5a6a7a">Listed ${daysListed} days ago</div>` : ''}
+    ${daysListed !== null ? `<div style="margin-top:6px;color:#6c757d">Listed ${daysListed} days ago</div>` : ''}
   `;
   document.getElementById('profit-preview').style.display = 'block';
 }
