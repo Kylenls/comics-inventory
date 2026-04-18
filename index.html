@@ -2323,6 +2323,26 @@ async function handleFOCFile(event) {
   if (!file) return;
   showStatus('foc-status', 'Reading FOC catalog...', 'loading');
 
+  // Send to Oracle's inbox via Airtable
+  const reader2 = new FileReader();
+  reader2.onload = async (e2) => {
+    try {
+      await fetch('/.netlify/functions/focupload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          filename: file.name,
+          content: e2.target.result,
+          distributor: distributor
+        })
+      });
+      console.log('FOC file queued for Oracle');
+    } catch(err) {
+      console.warn('Could not queue for Oracle:', err.message);
+    }
+  };
+  reader2.readAsText(file);
+
   const reader = new FileReader();
   reader.onload = (e) => {
     try {
