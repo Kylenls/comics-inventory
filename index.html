@@ -422,7 +422,7 @@
   <div class="panel active" id="panel-add">
     <div class="card">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:0.5rem">
-        <button class="btn-scan" style="font-size:13px;padding:11px 8px" onclick="openBarcodeScanner()">
+        <button class="btn-scan" style="font-size:13px;padding:11px 8px" onclick="document.getElementById('barcode-file-input').click()">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M4 6h2v12H4zm3 0h1v12H7zm2 0h2v12H9zm3 0h1v12h-1zm2 0h2v12h-2zm3 0h1v12h-1zM2 4v4H0V4C0 2.9.9 2 2 2h4v2H2zm20-2c1.1 0 2 .9 2 2v4h-2V4h-4V2h4zM2 16v4h4v2H2c-1.1 0-2-.9-2-2v-4h2zm20 4v-4h2v4c0 1.1-.9 2-2 2h-4v-2h4z"/></svg>
           Scan Barcode
         </button>
@@ -432,6 +432,7 @@
         </button>
       </div>
       <input type="file" id="cover-input" accept="image/*" capture="environment" style="display:none" onchange="handleCoverPhoto(event)" />
+      <input type="file" id="barcode-file-input" accept="image/*" capture="environment" style="display:none" onchange="handleBarcodePhoto(event)" />
 
       <div class="lookup-result" id="lookup-result">
         <strong id="lookup-title"></strong>
