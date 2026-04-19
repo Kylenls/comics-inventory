@@ -413,7 +413,7 @@
       <button class="tab" onclick="switchTab('pc')">PC</button>
       <button class="tab" onclick="switchTab('bundles')">Bundles</button>
       <button class="tab" onclick="switchTab('update')">Update</button>
-      <button class="tab" onclick="switchTab('ebay')">eBay</button>
+      <button class="tab" onclick="switchTab('ebay')">Sales</button>
       <button class="tab" onclick="switchTab('sell')">Sold</button>
       <button class="tab" onclick="switchTab('agents')">Agents</button>
     </div>
@@ -928,7 +928,7 @@
   <!-- EBAY SALES IMPORT -->
   <div class="panel" id="panel-ebay">
     <div class="card">
-      <div class="defaults-title" style="font-size:13px;font-weight:600;color:#212529;margin-bottom:0.5rem">Import eBay Sales History</div>
+      <div class="defaults-title" style="font-size:13px;font-weight:600;color:#212529;margin-bottom:0.5rem">📦 Import eBay Sales History</div>
       <p style="font-size:13px;color:#666;margin-bottom:1rem">Upload your eBay orders report CSV. The Watcher will use this data for margin analysis and sales intelligence.</p>
       <div class="drop-zone" id="ebay-drop-zone" onclick="document.getElementById('ebay-file').click()"
         ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleEbayDrop(event)">
@@ -962,11 +962,7 @@
       <button class="btn btn-primary" onclick="sendEbayToWatcher()" style="width:100%">Send to The Watcher — Analyze Sales</button>
       <div class="status" id="ebay-agent-status"></div>
     </div>
-  </div>
 
-  <!-- SELL -->
-  <div class="panel" id="panel-sell">
-    <!-- Search -->
     <div class="card">
       <div class="defaults-title" style="font-size:13px;font-weight:600;margin-bottom:8px">💰 Mark Sold</div>
       <div class="field">
@@ -1029,47 +1025,6 @@
       <button class="btn btn-danger" onclick="confirmSell()">✓ Confirm Sale</button>
       <button class="btn btn-secondary" style="margin-top:8px" onclick="closeSellModal()">Cancel</button>
       <div class="status" id="sell-status"></div>
-    </div>
-
-    <div class="card" style="margin-top:1rem">
-      <div class="defaults-title" style="font-size:13px;font-weight:600;color:#212529;margin-bottom:0.5rem">📺 Log Whatnot Show</div>
-      <p style="font-size:13px;color:#6c757d;margin-bottom:1rem">Log total revenue from a Whatnot liquidation show.</p>
-      
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
-        <div>
-          <label style="font-size:11px;color:#6c757d;display:block;margin-bottom:4px">SHOW DATE</label>
-          <input type="date" id="whatnot-date" style="width:100%;padding:8px;border:1px solid #dee2e6;border-radius:6px;font-size:13px" />
-        </div>
-        <div>
-          <label style="font-size:11px;color:#6c757d;display:block;margin-bottom:4px">TOTAL REVENUE</label>
-          <input type="number" id="whatnot-revenue" placeholder="0.00" step="0.01" style="width:100%;padding:8px;border:1px solid #dee2e6;border-radius:6px;font-size:13px" />
-        </div>
-      </div>
-      
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
-        <div>
-          <label style="font-size:11px;color:#6c757d;display:block;margin-bottom:4px">ITEMS SOLD</label>
-          <input type="number" id="whatnot-items" placeholder="0" style="width:100%;padding:8px;border:1px solid #dee2e6;border-radius:6px;font-size:13px" />
-        </div>
-        <div>
-          <label style="font-size:11px;color:#6c757d;display:block;margin-bottom:4px">SHOW TYPE</label>
-          <select id="whatnot-type" style="width:100%;padding:8px;border:1px solid #dee2e6;border-radius:6px;font-size:13px">
-            <option>$1 Moderns</option>
-            <option>$2 NCBD Variants</option>
-            <option>Blind Bags</option>
-            <option>Mixed Liquidation</option>
-            <option>Other</option>
-          </select>
-        </div>
-      </div>
-      
-      <div style="margin-bottom:8px">
-        <label style="font-size:11px;color:#6c757d;display:block;margin-bottom:4px">NOTES</label>
-        <input type="text" id="whatnot-notes" placeholder="Optional notes..." style="width:100%;padding:8px;border:1px solid #dee2e6;border-radius:6px;font-size:13px" />
-      </div>
-      
-      <button class="btn btn-primary" onclick="logWhatnotShow()" style="width:100%">Log Show to Watcher</button>
-      <div class="status" id="whatnot-status"></div>
     </div>
 
   </div>
