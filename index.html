@@ -2337,6 +2337,7 @@ async function handleFOCFile(event) {
         })
       });
       console.log('FOC file queued for Oracle');
+      showStatus('foc-status', '✓ FOC sent to Oracle inbox — analysis coming in Discord', 'success');
     } catch(err) {
       console.warn('Could not queue for Oracle:', err.message);
     }
