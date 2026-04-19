@@ -27,22 +27,15 @@ exports.handler = async (event) => {
       if (offset) params.offset = offset;
 
       const records = [];
-      let returnOffset = null;
 
       await new Promise((resolve, reject) => {
         base(useTable).select({ ...params, pageSize: 100 }).eachPage(
           (pageRecords, fetchNextPage) => {
             pageRecords.forEach(r => records.push({ id: r.id, fields: r.fields }));
-            if (offset || maxRecords) {
-              resolve();
-            } else {
-              fetchNextPage();
-            }
+            if (offset || maxRecords) resolve();
+            else fetchNextPage();
           },
-          (err) => {
-            if (err) reject(err);
-            else resolve();
-          }
+          (err) => { if (err) reject(err); else resolve(); }
         );
       });
 
@@ -60,28 +53,21 @@ exports.handler = async (event) => {
       if (offset) params.offset = offset;
 
       const records = [];
-      let returnOffset = null;
 
       await new Promise((resolve, reject) => {
         base(useTable).select(params).eachPage(
           (pageRecords, fetchNextPage) => {
             pageRecords.forEach(r => records.push({ id: r.id, fields: r.fields }));
-            if (maxRecords && records.length >= maxRecords) {
-              resolve();
-            } else {
-              fetchNextPage();
-            }
+            if (maxRecords && records.length >= maxRecords) resolve();
+            else fetchNextPage();
           },
-          (err) => {
-            if (err) reject(err);
-            else resolve();
-          }
+          (err) => { if (err) reject(err); else resolve(); }
         );
       });
 
       return {
         statusCode: 200, headers,
-        body: JSON.stringify({ records, offset: returnOffset })
+        body: JSON.stringify({ records, offset: null })
       };
     }
 
@@ -110,27 +96,49 @@ exports.handler = async (event) => {
     }
 
     if (action === 'upsert') {
-      const sku = fields['SKU'];
-      if (!sku) {
+      // CLZ duplicate check — use Series+Issue+Variant as unique key
+      const series = (fields['Series'] || '').trim();
+      const issue = (fields['Issue'] || '').trim();
+      const variant = (fields['Variant'] || '').trim();
+
+      if (!series) {
         const record = await base(useTable).create(fields);
         return {
           statusCode: 200, headers,
-          body: JSON.stringify({ id: record.id, fields: record.fields })
+          body: JSON.stringify({ id: record.id, fields: record.fields, _action: 'created' })
         };
+      }
+
+      // Count existing non-Sold records for this Series+Issue+Variant
+      const escapedSeries = series.replace(/'/g, "\\'");
+      const escapedIssue = issue.replace(/'/g, "\\'");
+      const escapedVariant = variant.replace(/'/g, "\\'");
+
+      let filterFormula;
+      if (variant) {
+        filterFormula = `AND({Series}='${escapedSeries}',{Issue}='${escapedIssue}',{Variant}='${escapedVariant}',{Status}!='Sold')`;
+      } else {
+        filterFormula = `AND({Series}='${escapedSeries}',{Issue}='${escapedIssue}',OR({Variant}='',{Variant}=BLANK()),{Status}!='Sold')`;
       }
 
       const existing = await base(useTable).select({
-        filterByFormula: `{SKU}="${sku}"`,
-        maxRecords: 1
+        filterByFormula: filterFormula,
+        fields: ['SKU', 'Status']
       }).firstPage();
 
       if (existing.length > 0) {
+        // Record already exists — skip
         return {
           statusCode: 200, headers,
-          body: JSON.stringify({ id: existing[0].id, fields: existing[0].fields, _action: 'skipped' })
+          body: JSON.stringify({
+            id: existing[0].id,
+            fields: existing[0].fields,
+            _action: 'skipped'
+          })
         };
       }
 
+      // No existing record — create new one
       const record = await base(useTable).create(fields);
       return {
         statusCode: 200, headers,
