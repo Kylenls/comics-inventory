@@ -4417,7 +4417,7 @@ async function handleEbayCSV(file) {
     let headerIdx = -1;
     let headers = [];
     for (let i = 0; i < lines.length; i++) {
-      if (lines[i].toLowerCase().includes('order number') || lines[i].toLowerCase().includes('sales record')) {
+      if (lines[i].toLowerCase().includes('sales record number') || lines[i].toLowerCase().includes('order number')) {
         headerIdx = i;
         headers = lines[i].split(',').map(h => h.replace(/"/g,'').trim().toLowerCase());
         break;
@@ -4434,7 +4434,7 @@ async function handleEbayCSV(file) {
       const cols = line.split(',').map(c => c.replace(/"/g,'').trim());
       const row = {};
       headers.forEach((h, idx) => row[h] = cols[idx] || '');
-      const salePrice = parseFloat(row['sale price'] || row['total price'] || row['item total price'] || 0);
+      const rawPrice = (row['sold for'] || row['total price'] || row['sale price'] || '0').replace(/[$,]/g, ''); const salePrice = parseFloat(rawPrice) || 0;
       if (salePrice === 0) continue;
       sales.push({
         orderNumber: row['order number'] || row['sales record number'] || '',
@@ -4442,7 +4442,7 @@ async function handleEbayCSV(file) {
         salePrice,
         quantity: parseInt(row['quantity'] || 1),
         saleDate: row['sale date'] || row['paid on date'] || '',
-        shippingCost: parseFloat(row['shipping and handling'] || row['postage and packaging'] || 0),
+        shippingCost: parseFloat((row['shipping and handling'] || row['postage and packaging'] || '0').replace(/[$,]/g, '')) || 0,
         platform: 'eBay'
       });
     }
