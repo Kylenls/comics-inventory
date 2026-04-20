@@ -1558,12 +1558,16 @@ async function startImport() {
   } catch(e) { console.warn('Could not get last SKU, starting from 1'); }
 
   let success = 0, failed = 0;
+  const sessionCounts = {}; // track how many we've created this session per key
 
   for (let i = 0; i < parsedRows.length; i++) {
     const r = parsedRows[i];
     const series = r['series'] || '';
     const issue = r['issue'] || '';
     if (!series) { failed++; continue; }
+    
+    const dupKey = (series + '|||' + issue + '|||' + (r['variant'] || '')).toLowerCase().trim();
+    sessionCounts[dupKey] = (sessionCounts[dupKey] || 0);
 
     const coverPrice = parseFloat(r['cover price']) || 0;
     let purchasePrice;
@@ -1598,11 +1602,11 @@ async function startImport() {
     if (defDate) fields['Purchase Date'] = defDate;
 
     try {
-      const data = await callAirtable({ action: 'upsert', fields });
+      const data = await callAirtable({ action: 'upsert', fields, sessionCount: sessionCounts[dupKey] });
       if (data.id) {
         const wasSkipped = data._action === 'skipped';
         if (wasSkipped) { skipped = (skipped||0) + 1; nextSkuNum--; } // don't burn a SKU on skip
-        else success++;
+        else { success++; sessionCounts[dupKey]++; }
         if (!wasSkipped) log.innerHTML += `<div class="ok">✓ ${sku} — ${series} #${issue}${fields['Variant'] ? ' (' + fields['Variant'] + ')' : ''}</div>`;
       } else {
         failed++;

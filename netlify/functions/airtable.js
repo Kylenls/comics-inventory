@@ -16,7 +16,7 @@ exports.handler = async (event) => {
 
   try {
     const body = JSON.parse(event.body || '{}');
-    const { action, id, fields, table, formula, sortField, sortDir, maxRecords, offset } = body;
+    const { action, id, fields, table, formula, sortField, sortDir, maxRecords, offset, sessionCount } = body;
     const useTable = table || TABLE;
 
     if (action === 'list') {
@@ -96,10 +96,10 @@ exports.handler = async (event) => {
     }
 
     if (action === 'upsert') {
-      // CLZ duplicate check — use Series+Issue+Variant as unique key
       const series = (fields['Series'] || '').trim();
       const issue = (fields['Issue'] || '').trim();
       const variant = (fields['Variant'] || '').trim();
+      const currentSessionCount = sessionCount || 0;
 
       if (!series) {
         const record = await base(useTable).create(fields);
@@ -109,7 +109,6 @@ exports.handler = async (event) => {
         };
       }
 
-      // Count existing non-Sold records for this Series+Issue+Variant
       const escapedSeries = series.replace(/'/g, "\\'");
       const escapedIssue = issue.replace(/'/g, "\\'");
       const escapedVariant = variant.replace(/'/g, "\\'");
@@ -126,8 +125,8 @@ exports.handler = async (event) => {
         fields: ['SKU', 'Status']
       }).firstPage();
 
-      if (existing.length > 0) {
-        // Record already exists — skip
+      // If we already have more records than sessionCount allows, skip
+      if (existing.length > currentSessionCount) {
         return {
           statusCode: 200, headers,
           body: JSON.stringify({
@@ -138,7 +137,7 @@ exports.handler = async (event) => {
         };
       }
 
-      // No existing record — create new one
+      // Create new record
       const record = await base(useTable).create(fields);
       return {
         statusCode: 200, headers,
