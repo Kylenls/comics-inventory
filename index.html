@@ -1448,7 +1448,9 @@ async function processImageBase64(base64, mediaType, mode) {
 function switchTab(tab) {
   const tabs = ['add','invoice','foc','import','inventory','pc','bundles','update','ebay','sell','agents','collage'];
   document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', tabs[i] === tab));
-  document.querySelectorAll('.panel').forEach((p,i) => p.classList.toggle('active', `panel-${tabs[i]}` === `panel-${tab}`));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  const target = document.getElementById('panel-' + tab);
+  if (target) target.classList.add('active');
   if (tab === 'inventory') { loadInventory(); loadCashPosition(); }
   if (tab === 'agents') loadAgentLog('1');
 checkPCDeepLink();
