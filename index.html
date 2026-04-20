@@ -1450,7 +1450,7 @@ async function processImageBase64(base64, mediaType, mode) {
 }
 
 function switchTab(tab) {
-  const tabs = ['add','invoice','foc','import','inventory','pc','bundles','update','ebay','sell','agents','collage'];
+  const tabs = ['add','invoice','foc','import','inventory','pc','bundles','update','ebay','collage','sell','agents'];
   document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', tabs[i] === tab));
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   const target = document.getElementById('panel-' + tab);
