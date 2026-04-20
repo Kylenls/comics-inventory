@@ -19,7 +19,7 @@ collage_html = """
         <div id="logo-preview" style="margin-top:8px"></div>
       </div>
 
-      <div class="drop-zone" id="collage-drop-zone" 
+      <div class="drop-zone" id="collage-drop-zone"
         onclick="document.getElementById('collage-photos').click()"
         ondragover="event.preventDefault()"
         ondrop="handleCollageDrop(event)"
@@ -41,7 +41,7 @@ collage_html = """
         <div class="defaults-title" style="font-size:11px;margin-bottom:8px">HERO COLLAGE</div>
         <canvas id="collage-canvas" style="width:100%;border-radius:8px;border:1px solid #dee2e6"></canvas>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
-          <button class="btn btn-secondary" onclick="downloadCollage()" style="font-size:13px">⬇ Download Collage</button>
+          <button class="btn btn-secondary" onclick="downloadCollage()" style="font-size:13px">Download Collage</button>
           <button class="btn btn-primary" onclick="sendCollageToTaskmaster()" style="font-size:13px">Send to Taskmaster</button>
         </div>
       </div>
@@ -63,7 +63,7 @@ function loadLogo(event) {
     const img = new Image();
     img.onload = () => {
       collageLogoImg = img;
-      document.getElementById('logo-preview').innerHTML = 
+      document.getElementById('logo-preview').innerHTML =
         '<img src="' + e.target.result + '" style="height:40px;border-radius:4px"> Logo loaded';
     };
     img.src = e.target.result;
@@ -100,10 +100,10 @@ function addCollagePhotos(files) {
 
 function renderPhotoGrid() {
   const grid = document.getElementById('collage-photo-grid');
-  grid.innerHTML = collagePhotos.map((p, i) => 
+  grid.innerHTML = collagePhotos.map((p, i) =>
     '<div style="position:relative">' +
     '<img src="' + p.src + '" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:6px">' +
-    '<button onclick="removeCollagePhoto(' + i + ')" style="position:absolute;top:2px;right:2px;background:rgba(0,0,0,0.6);color:white;border:none;border-radius:50%;width:20px;height:20px;font-size:11px;cursor:pointer;line-height:1">×</button>' +
+    '<button onclick="removeCollagePhoto(' + i + ')" style="position:absolute;top:2px;right:2px;background:rgba(0,0,0,0.6);color:white;border:none;border-radius:50%;width:20px;height:20px;font-size:11px;cursor:pointer;line-height:1">x</button>' +
     '<div style="text-align:center;font-size:10px;color:#6c757d;margin-top:2px">' + (i+1) + '</div>' +
     '</div>'
   ).join('');
@@ -156,21 +156,17 @@ async function buildCollage() {
     const row = Math.floor(i / cols);
     const x = padding + col * (cellSize + padding);
     const y = padding + row * (cellSize + padding);
-
-    // Draw image with cover fit
     const img = p.img;
     const scale = Math.min(cellSize / img.width, cellSize / img.height);
     const drawW = img.width * scale;
     const drawH = img.height * scale;
     const offsetX = x + (cellSize - drawW) / 2;
     const offsetY = y + (cellSize - drawH) / 2;
-
     ctx.fillStyle = '#f8f9fa';
     ctx.fillRect(x, y, cellSize, cellSize);
     ctx.drawImage(img, offsetX, offsetY, drawW, drawH);
   });
 
-  // Add watermark/logo
   if (collageLogoImg) {
     const logoH = Math.min(80, canvas.height * 0.06);
     const logoW = (collageLogoImg.width / collageLogoImg.height) * logoH;
@@ -179,12 +175,11 @@ async function buildCollage() {
     ctx.drawImage(collageLogoImg, canvas.width - logoW - margin, canvas.height - logoH - margin, logoW, logoH);
     ctx.globalAlpha = 1.0;
   } else {
-    // Text watermark
     const fontSize = Math.max(20, canvas.width * 0.02);
     ctx.font = 'bold ' + fontSize + 'px Arial';
     ctx.fillStyle = 'rgba(0,0,0,0.3)';
     ctx.textAlign = 'right';
-    ctx.fillText('ARC²', canvas.width - 16, canvas.height - 16);
+    ctx.fillText('ARC2', canvas.width - 16, canvas.height - 16);
   }
 
   document.getElementById('collage-output').style.display = 'block';
@@ -230,34 +225,39 @@ async function sendCollageToTaskmaster() {
 # Add collage tab button
 old_tabs = "onclick=\"switchTab('ebay')\">Sales</button>"
 new_tabs = "onclick=\"switchTab('ebay')\">Sales</button>\n      <button class=\"tab\" onclick=\"switchTab('collage')\">Collage</button>"
-content = content.replace(old_tabs, new_tabs, 1)
-print("Tab added" if 'collage' in content else "Tab not added")
+if old_tabs in content:
+    content = content.replace(old_tabs, new_tabs, 1)
+    print("Tab button added")
+else:
+    print("Tab button not found")
 
 # Add collage to switchTab array
-old_tabs_arr = "const tabs = ['add','invoice','foc','import','inventory','pc','bundles','update','ebay','sell','agents'];"
-new_tabs_arr = "const tabs = ['add','invoice','foc','import','inventory','pc','bundles','update','ebay','sell','agents','collage'];"
-content = content.replace(old_tabs_arr, new_tabs_arr, 1)
-print("Tab array updated" if 'collage' in content else "Tab array not updated")
-
-# Add collage panel before closing body
-old_body = '  <!-- SELL TAB -->'
-if old_body in content:
-    content = content.replace(old_body, collage_html + '\n\n  <!-- SELL TAB -->', 1)
-    print("Panel added via SELL TAB comment")
+old_arr = "const tabs = ['add','invoice','foc','import','inventory','pc','bundles','update','ebay','sell','agents'];"
+new_arr = "const tabs = ['add','invoice','foc','import','inventory','pc','bundles','update','ebay','sell','agents','collage'];"
+if old_arr in content:
+    content = content.replace(old_arr, new_arr, 1)
+    print("Tab array updated")
 else:
-    # Find sell panel
-    idx = content.find('class="panel panel-sell"')
-    if idx > 0:
-        insert_idx = content.rfind('\n  <div', 0, idx)
-        content = content[:insert_idx] + '\n' + collage_html + content[insert_idx:]
-        print("Panel added before sell panel")
-    else:
-        print("Could not find insertion point for panel")
+    print("Tab array not found")
 
-# Add JS
+# Insert collage panel before agents panel
+agents_idx = content.find('panel-agents">')
+if agents_idx > 0:
+    div_start = content.rfind('\n  <div', 0, agents_idx)
+    content = content[:div_start] + '\n' + collage_html + content[div_start:]
+    print("Panel inserted before agents")
+else:
+    print("Agents panel not found")
+
+# Add JS before barcode scanner comment
 old_js = '</script>\n\n<!-- Barcode S'
-content = content.replace(old_js, collage_js + '\n</script>\n\n<!-- Barcode S', 1)
-print("JS added" if 'buildCollage' in content else "JS not added")
+if old_js in content:
+    content = content.replace(old_js, collage_js + '\n</script>\n\n<!-- Barcode S', 1)
+    print("JS added")
+else:
+    print("JS insertion point not found")
 
 with open('/Users/kylenelson/arc2-comics/index.html', 'w') as f:
     f.write(content)
+
+print("Done")
