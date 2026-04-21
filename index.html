@@ -5075,17 +5075,29 @@ async function cleanAllListingPhotos() {
     showStatus('listing-status', 'Please add photos first', 'error');
     return;
   }
-  showStatus('listing-status', 'Starting AI photo cleaning...', 'loading');
+  
+  const btn = document.getElementById('listing-clean-btn');
+  if (btn) btn.disabled = true;
   
   let cleaned = 0;
+  let failed = 0;
+  
   for (let i = 0; i < listingPhotos.length; i++) {
-    const ok = await cleanListingPhoto(i);
-    if (ok) cleaned++;
-    // Small delay between API calls
-    await new Promise(r => setTimeout(r, 500));
+    showStatus('listing-status', 'AI cleaning photo ' + (i+1) + ' of ' + listingPhotos.length + '...', 'loading');
+    try {
+      const ok = await cleanListingPhoto(i);
+      if (ok) cleaned++;
+      else failed++;
+    } catch(e) {
+      console.error('Photo ' + (i+1) + ' failed:', e);
+      failed++;
+    }
+    // Longer delay between API calls to avoid rate limiting
+    await new Promise(r => setTimeout(r, 1500));
   }
   
-  showStatus('listing-status', cleaned + ' of ' + listingPhotos.length + ' photos cleaned by AI', 'success');
+  if (btn) btn.disabled = false;
+  showStatus('listing-status', cleaned + ' of ' + listingPhotos.length + ' photos cleaned' + (failed > 0 ? ', ' + failed + ' failed' : ''), cleaned > 0 ? 'success' : 'error');
 }
 
 </script>
