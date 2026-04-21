@@ -38,26 +38,33 @@ exports.handler = async (event) => {
             },
             {
               type: 'text',
-              text: `Analyze this comic book cover photo taken in a lightbox. Return ONLY a JSON object with these exact fields:
+              text: `This is a comic book cover photo taken in a lightbox. The lightbox has black fabric corners/edges that must be completely removed. Your job is to find the exact boundaries of the comic book cover itself and crop tightly to it.
+
+Look carefully for:
+- Where the black lightbox fabric ends and the comic cover begins
+- The exact edges of the comic (it may have a white border)
+- Any slight tilt that needs correction
+
+Return ONLY a JSON object with no other text:
 {
-  "cropTop": 0.05,
-  "cropBottom": 0.95,
-  "cropLeft": 0.05,
-  "cropRight": 0.95,
+  "cropTop": 0.08,
+  "cropBottom": 0.92,
+  "cropLeft": 0.08,
+  "cropRight": 0.92,
   "rotation": 0,
-  "brightnessAdjust": 0,
-  "contrastAdjust": 0,
+  "brightnessAdjust": 10,
+  "contrastAdjust": 5,
   "notes": ""
 }
 
-Where:
-- cropTop/Bottom/Left/Right are 0.0-1.0 fractions of the image to keep (trim dark edges and table)
-- rotation is degrees to rotate (-5 to 5) to straighten the comic
-- brightnessAdjust is -50 to +50 (positive = brighter)
-- contrastAdjust is -50 to +50 (positive = more contrast)
-- notes is a brief description of any issues
-
-Focus on: removing black lightbox corners, straightening slightly tilted comics, improving color accuracy. Return ONLY the JSON, no other text.`
+Rules:
+- cropTop/Bottom/Left/Right are 0.0-1.0 fractions indicating what portion of the image to KEEP
+- Be AGGRESSIVE with cropping - it is better to crop slightly into the comic than to leave any black fabric visible
+- If you see black corners, increase the crop margins until they disappear
+- rotation is -5 to +5 degrees to straighten the comic
+- brightnessAdjust is -50 to +50 (comics in lightboxes often need +5 to +15)
+- contrastAdjust is -50 to +50
+- Return ONLY valid JSON, nothing else`
             }
           ]
         }]
@@ -69,20 +76,26 @@ Focus on: removing black lightbox corners, straightening slightly tilted comics,
     
     let adjustments;
     try {
-      adjustments = JSON.parse(text.trim());
+      const clean = text.trim().replace(/```json\n?/g, '').replace(/```\n?/g, '');
+      adjustments = JSON.parse(clean);
     } catch(e) {
-      // Default safe crop if parsing fails
       adjustments = {
-        cropTop: 0.03,
-        cropBottom: 0.97,
-        cropLeft: 0.03,
-        cropRight: 0.97,
+        cropTop: 0.08,
+        cropBottom: 0.92,
+        cropLeft: 0.08,
+        cropRight: 0.92,
         rotation: 0,
-        brightnessAdjust: 5,
+        brightnessAdjust: 10,
         contrastAdjust: 5,
-        notes: 'Using default adjustments'
+        notes: 'Using default aggressive crop'
       };
     }
+
+    // Safety clamp values
+    adjustments.cropTop = Math.max(0, Math.min(0.4, adjustments.cropTop));
+    adjustments.cropBottom = Math.max(0.6, Math.min(1, adjustments.cropBottom));
+    adjustments.cropLeft = Math.max(0, Math.min(0.4, adjustments.cropLeft));
+    adjustments.cropRight = Math.max(0.6, Math.min(1, adjustments.cropRight));
 
     return {
       statusCode: 200,
