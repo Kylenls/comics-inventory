@@ -2,17 +2,6 @@ const Anthropic = require('@anthropic-ai/sdk');
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_KEY });
 
-const DISCORD_WEBHOOK = process.env.DISCORD_WEBHOOK_MARKET;
-
-async function postToDiscord(message) {
-  if (!DISCORD_WEBHOOK) return;
-  await fetch(DISCORD_WEBHOOK, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ content: message })
-  });
-}
-
 exports.handler = async (event) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
@@ -28,143 +17,78 @@ exports.handler = async (event) => {
     const body = JSON.parse(event.body || '{}');
     const { action } = body;
 
-    if (action === 'market_check') {
-      const { titles, publisher, year } = body;
-      const prompt = `You are Taskmaster, an eBay comic book market analyst for ARC2 Comics.
+    if (action === 'generate_listing') {
+      const { comics, count, mode } = body;
 
-Research current eBay market data for these comic titles:
-${titles.join('\n')}
-Publisher: ${publisher || 'Unknown'}
-Year: ${year || '2026'}
+      const prompt = `You are Taskmaster, an expert eBay seller specializing in comic books. Your listings consistently rank at the top of search results and convert browsers into buyers.
 
-For each title, provide:
-1. Estimated current selling price range on eBay
-2. Demand level (High/Medium/Low)
-3. Recent sales velocity
-4. Key selling points
+Generate an optimized eBay listing for these comics:
+${comics}
 
-Format as JSON array with fields: title, priceRange, demand, velocity, sellingPoints`;
+Listing type: ${mode === 'single' ? 'Single issue' : 'Bundle of ' + count + ' comics'}
 
-      const response = await client.messages.create({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        messages: [{ role: 'user', content: prompt }]
-      });
+eBay listing rules:
+- Title max 80 characters - pack with keywords buyers search for
+- Lead with the most recognizable/valuable comic in the bundle
+- Include: series name, issue number, key details (first appearance, variant, ratio), condition (NM/Near Mint), publisher
+- Use terms buyers search: "LOT", "RUN", "SET", "VARIANT", "1ST PRINT", "KEY ISSUE", "NM", "UNREAD"
+- Description should be 3-4 paragraphs: what's in the lot, why it's valuable, condition details, shipping info
+- Price using these rules: cover price × 1.8 for bundles, never be the highest price in market, account for 13% eBay fee
 
-      let results = [];
-      try {
-        const text = response.content[0].text;
-        const jsonMatch = text.match(/\[[\s\S]*\]/);
-        if (jsonMatch) results = JSON.parse(jsonMatch[0]);
-      } catch (e) {
-        results = [{ title: titles[0], priceRange: 'Check eBay', demand: 'Medium', velocity: 'Normal', sellingPoints: [] }];
-      }
+Pricing context:
+- All comics are brand new, unread, bagged and boarded
+- Free shipping always included
+- eBay fee: 13%
+- Bag/board cost: $0.15 per comic
 
-      return {
-        statusCode: 200, headers,
-        body: JSON.stringify({ success: true, results })
-      };
-    }
-
-    if (action === 'build_draft') {
-      const { bundleId, seriesTitle, issue, publisher, coverList, costBasis, variantDescription, pricingMode, marketData } = body;
-
-      const shippingTiers = [
-        { max: 5, cost: 9.99 },
-        { max: 10, cost: 14.99 },
-        { max: 19, cost: 17.99 },
-        { max: Infinity, cost: 19.99 }
-      ];
-
-      const coverCount = (coverList || '').split(',').length;
-      const shipping = shippingTiers.find(t => coverCount <= t.max)?.cost || 19.99;
-      const bagboard = coverCount * 0.15;
-      const totalCost = parseFloat(costBasis) + bagboard;
-      const breakEven = ((totalCost + shipping) / 0.87).toFixed(2);
-
-      const prompt = `You are Taskmaster, eBay listing specialist for ARC2 Comics (Aged Readers Comics Collective).
-
-Build an eBay bundle listing for:
-Series: ${seriesTitle} #${issue}
-Publisher: ${publisher || 'Unknown'}
-Covers: ${coverList}
-${variantDescription ? 'Special variants: ' + variantDescription : ''}
-Cost basis: $${costBasis}
-Break-even price: $${breakEven}
-Pricing mode: ${pricingMode === 'cost_plus' ? 'Cover Costs +10%' : 'Market Price ($1 under lowest comp)'}
-${marketData && marketData.length > 0 ? 'Market data: ' + JSON.stringify(marketData[0]) : ''}
-
-Rules:
-- Title max 80 characters
-- Free shipping always (baked into price)
-- eBay fee is 13%
-- Ratio variant premiums: 1:10=$9.99, 1:25=$14.99, 1:50=$30, 1:100=$45
-- Never be highest price in market
-
-Respond with JSON only:
+Return ONLY a JSON object with no other text:
 {
-  "title": "eBay listing title max 80 chars",
-  "price": 00.00,
-  "breakEven": "${breakEven}",
-  "margin": 00.00,
-  "description": "2-3 sentence listing description",
-  "reasoning": "Why this price"
+  "title": "eBay listing title here (max 80 chars)",
+  "price": 29.99,
+  "description": "Full listing description here...",
+  "keywords": ["keyword1", "keyword2"]
 }`;
 
-      const response = await client.messages.create({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
+      const message = await client.messages.create({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 1024,
         messages: [{ role: 'user', content: prompt }]
       });
 
-      let draft = {};
+      const text = message.content[0].text;
+      let listing;
       try {
-        const text = response.content[0].text;
-        const jsonMatch = text.match(/\{[\s\S]*\}/);
-        if (jsonMatch) draft = JSON.parse(jsonMatch[0]);
-      } catch (e) {
-        draft = {
-          title: `${seriesTitle} #${issue} Complete Cover Set ${coverList}`,
-          price: parseFloat(breakEven) * 1.1,
-          breakEven,
-          margin: (parseFloat(breakEven) * 0.1).toFixed(2),
-          description: 'Complete cover variant set. All books Near Mint. Free shipping.',
-          reasoning: 'Priced at break-even +10%'
-        };
+        const clean = text.trim().replace(/```json\n?/g, '').replace(/```\n?/g, '');
+        listing = JSON.parse(clean);
+      } catch(e) {
+        return { statusCode: 500, headers, body: JSON.stringify({ error: 'Failed to parse listing: ' + text }) };
       }
 
+      // Enforce 80 char title limit
+      if (listing.title && listing.title.length > 80) {
+        listing.title = listing.title.substring(0, 80);
+      }
+
+      return { statusCode: 200, headers, body: JSON.stringify({ ...listing, success: true }) };
+    }
+
+    if (action === 'publish_listing') {
+      // eBay publish placeholder - returns success for now
+      const { title, price, description } = body;
       return {
         statusCode: 200, headers,
-        body: JSON.stringify({ success: true, draft, bundleId })
+        body: JSON.stringify({
+          success: true,
+          message: 'Listing queued for publish - eBay OAuth integration coming soon',
+          listingId: 'PENDING-' + Date.now()
+        })
       };
     }
 
-    if (action === 'publish_draft') {
-      const { draft, extraContext, collageImage } = body;
-      await postToDiscord(`⚔️ **Taskmaster** — Draft listing ready for review:\n**${draft.title}**\nPrice: $${draft.price} | Break-even: $${draft.breakEven} | Margin: $${draft.margin}\n${draft.description}`);
-      return {
-        statusCode: 200, headers,
-        body: JSON.stringify({ success: true, message: 'Draft posted to Discord' })
-      };
-    }
+    return { statusCode: 400, headers, body: JSON.stringify({ error: 'Unknown action: ' + action }) };
 
-    if (action === 'get_listings') {
-      return {
-        statusCode: 200, headers,
-        body: JSON.stringify({ success: true, listings: [] })
-      };
-    }
-
-    return {
-      statusCode: 400, headers,
-      body: JSON.stringify({ error: 'Unknown action: ' + action })
-    };
-
-  } catch (e) {
+  } catch(e) {
     console.error('agent2 error:', e);
-    return {
-      statusCode: 500, headers,
-      body: JSON.stringify({ error: e.message })
-    };
+    return { statusCode: 500, headers, body: JSON.stringify({ error: e.message }) };
   }
-}
+};
