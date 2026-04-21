@@ -1173,6 +1173,16 @@
         </div>
       </div>
 
+      <div style="margin-bottom:1rem">
+        <div class="defaults-title" style="font-size:11px;margin-bottom:8px">WATERMARK LOGO</div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div id="logo-preview-listing" style="font-size:13px;color:#6c757d">No logo uploaded</div>
+          <button class="btn btn-secondary" onclick="document.getElementById('logo-upload-input').click()" style="font-size:12px">Upload Logo</button>
+          <button class="btn btn-secondary" onclick="clearSavedLogo()" style="font-size:12px;color:#dc3545">Clear</button>
+        </div>
+        <input type="file" id="logo-upload-input" accept="image/png,image/jpeg" style="display:none" onchange="saveLogo(event)" />
+      </div>
+
       <div style="margin-top:1rem">
         <div class="defaults-title" style="font-size:11px;margin-bottom:8px">PHOTOS (<span id="listing-photo-count">0</span> uploaded)</div>
         <div class="drop-zone" id="listing-drop-zone"
@@ -1495,6 +1505,7 @@ async function processImageBase64(base64, mediaType, mode) {
 }
 
 function switchTab(tab) {
+  if (typeof initLogo === 'function' && !savedLogoImg) initLogo();
   const tabs = ['add','invoice','foc','import','inventory','pc','bundles','update','ebay','listings','agents'];
   document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', tabs[i] === tab));
   document.querySelectorAll('.panel').forEach((p,i) => p.classList.toggle('active', `panel-${tabs[i]}` === `panel-${tab}`));
@@ -4822,11 +4833,20 @@ async function buildListingCollage() {
     ctx.fillRect(x, y, cellSize, cellSize);
     ctx.drawImage(img, x + (cellSize - drawW) / 2, y + (cellSize - drawH) / 2, drawW, drawH);
   });
-  const fontSize = Math.max(20, canvas.width * 0.02);
-  ctx.font = 'bold ' + fontSize + 'px Arial';
-  ctx.fillStyle = 'rgba(0,0,0,0.25)';
-  ctx.textAlign = 'right';
-  ctx.fillText('ARC2', canvas.width - 16, canvas.height - 16);
+  if (savedLogoImg) {
+    const logoH = Math.min(80, canvas.height * 0.06);
+    const logoW = (savedLogoImg.width / savedLogoImg.height) * logoH;
+    const margin = 16;
+    ctx.globalAlpha = 0.85;
+    ctx.drawImage(savedLogoImg, canvas.width - logoW - margin, canvas.height - logoH - margin, logoW, logoH);
+    ctx.globalAlpha = 1.0;
+  } else {
+    const fontSize = Math.max(20, canvas.width * 0.02);
+    ctx.font = 'bold ' + fontSize + 'px Arial';
+    ctx.fillStyle = 'rgba(0,0,0,0.25)';
+    ctx.textAlign = 'right';
+    ctx.fillText('ARC2', canvas.width - 16, canvas.height - 16);
+  }
   document.getElementById('listing-collage-output').style.display = 'block';
   showStatus('listing-status', 'Collage ready - ' + listingPhotos.length + ' photos in ' + cols + 'x' + rows + ' grid', 'success');
 }
@@ -5112,6 +5132,48 @@ async function cleanAllListingPhotos() {
   
   if (btn) btn.disabled = false;
   showStatus('listing-status', cleaned + ' of ' + listingPhotos.length + ' photos cleaned' + (failed > 0 ? ', ' + failed + ' failed' : ''), cleaned > 0 ? 'success' : 'error');
+}
+
+
+// ── LOGO / WATERMARK ─────────────────────────────────
+let savedLogoImg = null;
+
+function initLogo() {
+  const saved = localStorage.getItem('arc2_logo_base64');
+  if (saved) {
+    const img = new Image();
+    img.onload = () => {
+      savedLogoImg = img;
+      document.getElementById('logo-preview-listing').innerHTML =
+        '<img src="' + saved + '" style="height:32px;border-radius:4px;margin-right:6px"> Logo loaded';
+    };
+    img.src = saved;
+  }
+}
+
+function saveLogo(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const src = e.target.result;
+    localStorage.setItem('arc2_logo_base64', src);
+    const img = new Image();
+    img.onload = () => {
+      savedLogoImg = img;
+      document.getElementById('logo-preview-listing').innerHTML =
+        '<img src="' + src + '" style="height:32px;border-radius:4px;margin-right:6px"> Logo saved';
+    };
+    img.src = src;
+  };
+  reader.readAsDataURL(file);
+  event.target.value = '';
+}
+
+function clearSavedLogo() {
+  localStorage.removeItem('arc2_logo_base64');
+  savedLogoImg = null;
+  document.getElementById('logo-preview-listing').innerHTML = 'No logo uploaded';
 }
 
 </script>
