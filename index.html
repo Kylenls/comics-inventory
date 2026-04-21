@@ -4951,6 +4951,14 @@ async function quickBundleSearch() {
   ).join('');
 }
 
+function addToQuickBundleByIdx(idx) {
+  const r = window._qbSearchResults && window._qbSearchResults[idx];
+  if (!r) return;
+  if (quickBundleItems.find(i => i.id === r.id)) return;
+  quickBundleItems.push(r);
+  renderQuickBundleQueue();
+}
+
 function addToQuickBundle(recordJson) {
   try {
     const r = JSON.parse(recordJson);
@@ -5004,12 +5012,22 @@ async function searchSingleListing() {
     results.innerHTML = '<p style="font-size:13px;color:#6c757d">No results</p>';
     return;
   }
-  results.innerHTML = data.records.map(r =>
+  window._singleSearchResults = data.records;
+  results.innerHTML = data.records.map((r, idx) =>
     '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #f0f0f0">' +
     '<span style="font-size:13px">' + (r.fields['Series'] || '') + ' #' + (r.fields['Issue'] || '') + ' ' + (r.fields['Variant'] || '') + '</span>' +
-    '<button onclick="selectSingleListing(\'' + JSON.stringify(r).replace(/"/g, "'") + '\')" class="btn btn-primary" style="font-size:11px;padding:4px 8px">Select</button>' +
+    '<button onclick="selectSingleListingByIdx(' + idx + ')" class="btn btn-primary" style="font-size:11px;padding:4px 8px">Select</button>' +
     '</div>'
   ).join('');
+}
+
+function selectSingleListingByIdx(idx) {
+  const r = window._singleSearchResults && window._singleSearchResults[idx];
+  if (!r) return;
+  listingSingleComic = r;
+  document.getElementById('listing-single-results').innerHTML =
+    '<div style="padding:8px;background:#f0f9f0;border-radius:6px;font-size:13px">Selected: ' +
+    r.fields['Series'] + ' #' + r.fields['Issue'] + '</div>';
 }
 
 function selectSingleListing(recordJson) {
