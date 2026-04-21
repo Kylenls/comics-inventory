@@ -4972,7 +4972,7 @@ async function searchSingleListing() {
   results.innerHTML = data.records.map(r =>
     '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #f0f0f0">' +
     '<span style="font-size:13px">' + (r.fields['Series'] || '') + ' #' + (r.fields['Issue'] || '') + ' ' + (r.fields['Variant'] || '') + '</span>' +
-    '<button onclick='selectSingleListing(' + JSON.stringify(JSON.stringify(r)) + ')' class="btn btn-primary" style="font-size:11px;padding:4px 8px">Select</button>' +
+    '<button onclick="selectSingleListing(\'' + JSON.stringify(r).replace(/"/g, "'") + '\')" class="btn btn-primary" style="font-size:11px;padding:4px 8px">Select</button>' +
     '</div>'
   ).join('');
 }
