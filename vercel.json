@@ -1,0 +1,13 @@
+{
+  "functions": {
+    "netlify/functions/*.js": {
+      "runtime": "nodejs20.x"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/.netlify/functions/:path*",
+      "destination": "/netlify/functions/:path*"
+    }
+  ]
+}
