@@ -4943,10 +4943,11 @@ async function quickBundleSearch() {
     results.innerHTML = '<p style="font-size:13px;color:#6c757d;padding:8px">No results</p>';
     return;
   }
-  results.innerHTML = data.records.map(r =>
+  window._qbSearchResults = data.records;
+  results.innerHTML = data.records.map((r, idx) =>
     '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #f0f0f0">' +
     '<span style="font-size:13px">' + (r.fields['Series'] || '') + ' #' + (r.fields['Issue'] || '') + ' ' + (r.fields['Variant'] || '') + '</span>' +
-    '<button onclick="addToQuickBundle(' + JSON.stringify(JSON.stringify(r)).slice(1,-1) + ')" class="btn btn-secondary" style="font-size:11px;padding:4px 8px">Add</button>' +
+    '<button onclick="addToQuickBundleByIdx(' + idx + ')" class="btn btn-secondary" style="font-size:11px;padding:4px 8px">Add</button>' +
     '</div>'
   ).join('');
 }
