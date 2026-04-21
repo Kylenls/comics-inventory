@@ -10,10 +10,15 @@ exports.handler = async (event) => {
   }
 
   try {
-    const { imageBase64, mediaType } = JSON.parse(event.body || '{}');
+    const body = JSON.parse(event.body || '{}');
+    const { imageBase64, mediaType } = body;
+    
     if (!imageBase64) {
       return { statusCode: 400, headers, body: JSON.stringify({ error: 'No image provided' }) };
     }
+
+    console.log('cleanphoto: image size', imageBase64.length, 'chars');
+    console.log('cleanphoto: ANTHROPIC_KEY present:', !!process.env.ANTHROPIC_KEY);
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -23,8 +28,8 @@ exports.handler = async (event) => {
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'claude-opus-4-5',
-        max_tokens: 1024,
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 512,
         messages: [{
           role: 'user',
           content: [
@@ -38,41 +43,25 @@ exports.handler = async (event) => {
             },
             {
               type: 'text',
-              text: `This is a comic book cover photo taken in a lightbox. The lightbox has black fabric corners/edges that must be completely removed. Your job is to find the exact boundaries of the comic book cover itself and crop tightly to it.
-
-Look carefully for:
-- Where the black lightbox fabric ends and the comic cover begins
-- The exact edges of the comic (it may have a white border)
-- Any slight tilt that needs correction
-
-Return ONLY a JSON object with no other text:
-{
-  "cropTop": 0.08,
-  "cropBottom": 0.92,
-  "cropLeft": 0.08,
-  "cropRight": 0.92,
-  "rotation": 0,
-  "brightnessAdjust": 10,
-  "contrastAdjust": 5,
-  "notes": ""
-}
-
-Rules:
-- cropTop/Bottom/Left/Right are 0.0-1.0 fractions indicating what portion of the image to KEEP
-- Be AGGRESSIVE with cropping - it is better to crop slightly into the comic than to leave any black fabric visible
-- If you see black corners, increase the crop margins until they disappear
-- rotation is -5 to +5 degrees to straighten the comic
-- brightnessAdjust is -50 to +50 (comics in lightboxes often need +5 to +15)
-- contrastAdjust is -50 to +50
-- Return ONLY valid JSON, nothing else`
+              text: `Look at this comic book photo taken in a lightbox. Return ONLY this JSON with crop values to remove black edges:
+{"cropTop":0.05,"cropBottom":0.95,"cropLeft":0.05,"cropRight":0.95,"rotation":0,"brightnessAdjust":10,"contrastAdjust":5,"notes":""}
+Adjust the crop values to tightly frame the comic cover, removing black lightbox corners. Return ONLY valid JSON.`
             }
           ]
         }]
       })
     });
 
+    console.log('cleanphoto: API status', response.status);
     const data = await response.json();
+    console.log('cleanphoto: API response', JSON.stringify(data).slice(0, 200));
+
+    if (data.error) {
+      return { statusCode: 500, headers, body: JSON.stringify({ error: data.error.message }) };
+    }
+
     const text = data.content?.[0]?.text || '{}';
+    console.log('cleanphoto: text response', text);
     
     let adjustments;
     try {
@@ -80,35 +69,20 @@ Rules:
       adjustments = JSON.parse(clean);
     } catch(e) {
       adjustments = {
-        cropTop: 0.08,
-        cropBottom: 0.92,
-        cropLeft: 0.08,
-        cropRight: 0.92,
-        rotation: 0,
-        brightnessAdjust: 10,
-        contrastAdjust: 5,
-        notes: 'Using default aggressive crop'
+        cropTop: 0.06, cropBottom: 0.94, cropLeft: 0.06, cropRight: 0.94,
+        rotation: 0, brightnessAdjust: 10, contrastAdjust: 5, notes: 'default'
       };
     }
 
-    // Safety clamp values
-    adjustments.cropTop = Math.max(0, Math.min(0.4, adjustments.cropTop));
-    adjustments.cropBottom = Math.max(0.6, Math.min(1, adjustments.cropBottom));
-    adjustments.cropLeft = Math.max(0, Math.min(0.4, adjustments.cropLeft));
-    adjustments.cropRight = Math.max(0.6, Math.min(1, adjustments.cropRight));
+    adjustments.cropTop = Math.max(0, Math.min(0.4, adjustments.cropTop || 0.06));
+    adjustments.cropBottom = Math.max(0.6, Math.min(1, adjustments.cropBottom || 0.94));
+    adjustments.cropLeft = Math.max(0, Math.min(0.4, adjustments.cropLeft || 0.06));
+    adjustments.cropRight = Math.max(0.6, Math.min(1, adjustments.cropRight || 0.94));
 
-    return {
-      statusCode: 200,
-      headers,
-      body: JSON.stringify({ success: true, adjustments })
-    };
+    return { statusCode: 200, headers, body: JSON.stringify({ success: true, adjustments }) };
 
   } catch(e) {
-    console.error('cleanphoto error:', e);
-    return {
-      statusCode: 500,
-      headers,
-      body: JSON.stringify({ error: e.message })
-    };
+    console.error('cleanphoto error:', e.message, e.stack);
+    return { statusCode: 500, headers, body: JSON.stringify({ error: e.message }) };
   }
 };
