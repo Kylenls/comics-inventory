@@ -1538,9 +1538,7 @@ function switchTab(tab) {
   document.querySelectorAll('.panel').forEach((p,i) => p.classList.toggle('active', `panel-${tabs[i]}` === `panel-${tab}`));
   if (tab === 'inventory') { loadInventory(); loadCashPosition(); }
   if (tab === 'agents') loadAgentLog('1');
-checkPCDeepLink();
   if (tab === 'sell' && !allRecords.length) loadInventory();
-checkPCDeepLink();
 }
 
 function showStatus(id, msg, type) {
@@ -3657,7 +3655,7 @@ function renderBundlePlanner(bySeries, total, forSale) {
         '<label style="display:flex;align-items:center;gap:4px;cursor:pointer"><input type="radio" name="mode-'+safeKey+'" id="mode-'+safeKey+'-standard" value="standard" checked> Market Price ($1 under comp)</label>' +
         '<label style="display:flex;align-items:center;gap:4px;cursor:pointer"><input type="radio" name="mode-'+safeKey+'" id="mode-'+safeKey+'-cost" value="cost_plus"> Cover Costs +10%</label>' +
         '</div></div>' +
-        '<button onclick="agent2BuildDraftByKey(\''+safeKey+'\')" style="width:100%;margin-top:8px;padding:8px;background:#0066cc;border:1px solid #0066cc;color:white;border:none;border-radius:8px;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer">⚔️ Taskmaster — Build Draft Listing</button>' +
+        '<button onclick="agent2BuildDraftByKey(\''+safeKey+'\')" style="width:100%;margin-top:8px;padding:8px;background:#0066cc;border:1px solid #0066cc;color:white;border:none;border-radius:8px;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer">📋 Stage for Listing Generator</button>' +
         '<div id="draft-status-'+safeKey+'" style="margin-top:6px;font-size:12px"></div>';
       return buildCard(key) + draftBtn;
     }).join('');
