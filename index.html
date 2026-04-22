@@ -5113,7 +5113,7 @@ function initLogo() {
     const img = new Image();
     img.onload = () => {
       savedLogoImg = img;
-      document.getElementById('logo-preview-listing').innerHTML =
+      const logoEl = document.getElementById('logo-preview-listing'); if (logoEl) logoEl.innerHTML =
         '<img src="' + saved + '" style="height:32px;border-radius:4px;margin-right:6px"> Logo loaded';
     };
     img.src = saved;
@@ -5130,7 +5130,7 @@ function saveLogo(event) {
     const img = new Image();
     img.onload = () => {
       savedLogoImg = img;
-      document.getElementById('logo-preview-listing').innerHTML =
+      const logoEl = document.getElementById('logo-preview-listing'); if (logoEl) logoEl.innerHTML =
         '<img src="' + src + '" style="height:32px;border-radius:4px;margin-right:6px"> Logo saved';
     };
     img.src = src;
@@ -5142,7 +5142,7 @@ function saveLogo(event) {
 function clearSavedLogo() {
   localStorage.removeItem('arc2_logo_base64');
   savedLogoImg = null;
-  document.getElementById('logo-preview-listing').innerHTML = 'No logo uploaded';
+  const logoEl = document.getElementById('logo-preview-listing'); if (logoEl) logoEl.innerHTML = 'No logo uploaded';
 }
 
 
