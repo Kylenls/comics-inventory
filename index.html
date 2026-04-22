@@ -1148,6 +1148,17 @@
       <div class="defaults-title" style="font-size:13px;font-weight:600;color:#212529;margin-bottom:0.5rem">🏷️ eBay Listing Generator</div>
       <p style="font-size:13px;color:#6c757d;margin-bottom:1rem">Upload photos, generate AI-cleaned covers, build collage, and let Taskmaster write your listing.</p>
 
+      <div id="listing-queue-card" style="margin-bottom:1rem">
+        <div class="defaults-title" style="font-size:11px;margin-bottom:8px">LISTING QUEUE (<span id="queue-count">0</span> bundles)</div>
+        <div id="listing-queue-list" style="max-height:200px;overflow-y:auto;margin-bottom:8px">
+          <p style="font-size:13px;color:#6c757d">No bundles queued yet. Send bundles from the Bundles tab.</p>
+        </div>
+        <div id="active-listing-banner" style="display:none;padding:8px;background:#e8f4fd;border-radius:6px;font-size:13px;margin-bottom:8px">
+          <strong>Active: </strong><span id="active-listing-name"></span>
+          <span id="active-listing-badge" style="margin-left:8px;padding:2px 8px;border-radius:10px;font-size:11px"></span>
+        </div>
+      </div>
+
       <div id="listing-source-card">
         <div class="defaults-title" style="font-size:11px;margin-bottom:8px">LISTING SOURCE</div>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:1rem">
@@ -1196,6 +1207,9 @@
 
       <div style="margin-top:1rem">
         <div class="defaults-title" style="font-size:11px;margin-bottom:8px">PHOTOS (<span id="listing-photo-count">0</span> uploaded)</div>
+        <div id="reuse-photos-banner" style="display:none;margin-bottom:8px">
+          <button class="btn btn-secondary" onclick="reuseStandardPhotos()" style="width:100%;font-size:13px">♻️ Reuse Photos from Bundle 1</button>
+        </div>
         <div class="drop-zone" id="listing-drop-zone"
           onclick="document.getElementById('listing-photos').click()"
           ondragover="event.preventDefault()"
@@ -4817,6 +4831,7 @@ function getGridDimensions(count) {
 }
 
 async function buildListingCollage() {
+  saveActiveQueuePhotos();
   if (!listingPhotos.length) {
     showStatus('listing-status', 'Please add photos first', 'error');
     return;
@@ -4896,6 +4911,12 @@ async function generateListing() {
       document.getElementById('listing-price').value = data.price || '';
       document.getElementById('listing-draft').style.display = 'block';
       showStatus('listing-status', 'Listing draft ready - review and publish', 'success');
+      // Save draft to queue
+      if (activeQueueIdx >= 0 && listingQueue[activeQueueIdx]) {
+        listingQueue[activeQueueIdx].draft = { title: data.title, price: data.price, description: data.description };
+        listingQueue[activeQueueIdx].status = 'Draft Ready';
+        renderListingQueue();
+      }
     } else {
       showStatus('listing-status', 'Error: ' + (data.error || 'Unknown error'), 'error');
     }
@@ -5300,6 +5321,97 @@ function getListingComicsString() {
 }
 
 
+// ── LISTING QUEUE ────────────────────────────────────
+let listingQueue = [];
+let activeQueueIdx = -1;
+
+function renderListingQueue() {
+  document.getElementById('queue-count').textContent = listingQueue.length;
+  const list = document.getElementById('listing-queue-list');
+  if (!listingQueue.length) {
+    list.innerHTML = '<p style="font-size:13px;color:#6c757d">No bundles queued. Send from Bundles tab.</p>';
+    return;
+  }
+  list.innerHTML = listingQueue.map((item, idx) => {
+    const isActive = idx === activeQueueIdx;
+    const statusColor = item.status === 'Published' ? '#198754' : item.status === 'Draft Ready' ? '#0066cc' : item.status === 'Photos Added' ? '#fd7e14' : '#6c757d';
+    return '<div onclick="activateQueueItem(' + idx + ')" style="display:flex;justify-content:space-between;align-items:center;padding:8px;margin-bottom:4px;border-radius:6px;cursor:pointer;border:2px solid ' + (isActive ? '#0066cc' : '#dee2e6') + ';background:' + (isActive ? '#e8f4fd' : '#fff') + '">' +
+      '<div>' +
+      '<div style="font-size:13px;font-weight:600">' + item.name + '</div>' +
+      '<div style="font-size:11px;color:#6c757d">' + item.comicCount + ' comics | ' + (item.isPremium ? '⭐ Premium' : 'Standard') + '</div>' +
+      '</div>' +
+      '<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:' + statusColor + '20;color:' + statusColor + '">' + item.status + '</span>' +
+      '</div>';
+  }).join('');
+}
+
+function activateQueueItem(idx) {
+  activeQueueIdx = idx;
+  const item = listingQueue[idx];
+  
+  // Update banner
+  document.getElementById('active-listing-banner').style.display = 'block';
+  document.getElementById('active-listing-name').textContent = item.name;
+  const badge = document.getElementById('active-listing-badge');
+  badge.textContent = item.isPremium ? '⭐ Premium Bundle' : 'Standard Bundle';
+  badge.style.background = item.isPremium ? '#F0E8FA' : '#E8F8F3';
+  badge.style.color = item.isPremium ? '#7B3FB5' : '#198754';
+  
+  // Load bundle into listing generator
+  listingBundle = item.bundleData;
+  setListingMode('bundle');
+  document.getElementById('listing-bundle-name').value = item.name;
+  document.getElementById('listing-bundle-comics').innerHTML = 
+    '<div style="font-size:12px;color:#6c757d;margin-top:4px">' + item.variantSummary + '</div>';
+  
+  // If standard bundle and we have photos from premium, offer to reuse
+  if (!item.isPremium && listingQueue[0] && listingQueue[0].photos && listingQueue[0].photos.length) {
+    showStatus('listing-status', 'Tip: This is a standard bundle. You can reuse photos from Bundle 1 or upload new ones.', 'loading');
+  } else {
+    showStatus('listing-status', 'Bundle loaded - upload photos then generate listing', 'success');
+  }
+  
+  // Restore photos if already uploaded for this item
+  if (item.photos && item.photos.length) {
+    listingPhotos = item.photos;
+    renderListingPhotoGrid();
+  } else {
+    listingPhotos = [];
+    renderListingPhotoGrid();
+  }
+  
+  // Restore draft if exists
+  if (item.draft) {
+    document.getElementById('listing-title').value = item.draft.title || '';
+    document.getElementById('listing-price').value = item.draft.price || '';
+    document.getElementById('listing-description').value = item.draft.description || '';
+    document.getElementById('listing-draft').style.display = 'block';
+  } else {
+    document.getElementById('listing-draft').style.display = 'none';
+  }
+  
+  renderListingQueue();
+}
+
+function saveActiveQueuePhotos() {
+  if (activeQueueIdx >= 0 && listingQueue[activeQueueIdx]) {
+    listingQueue[activeQueueIdx].photos = [...listingPhotos];
+    if (listingPhotos.length > 0 && listingQueue[activeQueueIdx].status === 'Pending') {
+      listingQueue[activeQueueIdx].status = 'Photos Added';
+      renderListingQueue();
+    }
+  }
+}
+
+function reuseStandardPhotos() {
+  if (listingQueue[0] && listingQueue[0].photos && listingQueue[0].photos.length) {
+    // Copy photos from bundle 1 but exclude ratio-only photos
+    listingPhotos = [...listingQueue[0].photos];
+    renderListingPhotoGrid();
+    showStatus('listing-status', 'Photos copied from Bundle 1 - remove any ratio variant photos that don\'t apply', 'success');
+  }
+}
+
 // ── BUNDLE TO LISTING GENERATOR ─────────────────────
 function agent2BuildDraftByKey(safeKey) {
   const bundleData = window._bundleData && window._bundleData[safeKey];
@@ -5355,13 +5467,33 @@ function agent2BuildDraftByKey(safeKey) {
     '<div style="font-size:12px;color:#6c757d;margin-top:4px">' + variantDetails + '</div>' +
     (ratios.length ? '<div style="font-size:12px;color:#7B3FB5;margin-top:2px">Ratio variants: ' + ratios.join(', ') + '</div>' : '');
 
-  // Switch to listings tab
+  // Determine if this is a premium bundle (has ratio variants)
+  const isPremium = ratios.length > 0;
+  
+  // Add to queue
+  const queueItem = {
+    id: safeKey + '_' + Date.now(),
+    name: bundleData.series + ' #' + bundleData.issue + (isPremium ? ' — Premium Bundle' : ' — Standard Bundle ' + (listingQueue.filter(i => !i.isPremium).length + 1)),
+    comicCount,
+    isPremium,
+    status: 'Pending',
+    bundleData: listingBundle,
+    variantSummary: variantDetails + ratioStr,
+    photos: [],
+    draft: null
+  };
+  
+  listingQueue.push(queueItem);
+  renderListingQueue();
+
+  // Switch to listings tab and activate this item
   switchTab('listings');
+  activateQueueItem(listingQueue.length - 1);
 
   // Show confirmation in bundle planner
   const statusEl = document.getElementById('draft-status-' + safeKey);
   if (statusEl) {
-    statusEl.innerHTML = '<span style="color:#198754;font-size:12px">✓ Sent to eBay Listing Generator</span>';
+    statusEl.innerHTML = '<span style="color:#198754;font-size:12px">✓ Added to listing queue (' + listingQueue.length + ' total)</span>';
   }
 }
 
