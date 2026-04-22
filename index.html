@@ -3531,6 +3531,7 @@ async function loadBundlePlanner() {
     });
 
     bundlePlan = bySeries;
+    window.bundlePlan = bySeries;
     renderBundlePlanner(bySeries, allRecords.length, forSale.length);
     document.getElementById('bundle-load-status').style.display = 'none';
     document.getElementById('bundle-planner-results').style.display = 'block';
