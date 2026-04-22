@@ -3778,9 +3778,9 @@ function sendAllStagedToListings() {
   if (!stagedBundles.length) return;
   listingQueue = [...stagedBundles];
   activeQueueIdx = -1;
-  renderListingQueue();
   switchTab('listings');
-  if (listingQueue.length > 0) activateQueueItem(0);
+  if (typeof renderListingQueue === 'function') renderListingQueue();
+  if (listingQueue.length > 0 && typeof activateQueueItem === 'function') activateQueueItem(0);
 }
 
 
