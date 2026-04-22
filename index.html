@@ -4912,9 +4912,9 @@ async function generateListing() {
       document.getElementById('listing-draft').style.display = 'block';
       showStatus('listing-status', 'Listing draft ready - review and publish', 'success');
       // Save draft to queue
-      if (activeQueueIdx >= 0 && listingQueue[activeQueueIdx]) {
-        listingQueue[activeQueueIdx].draft = { title: data.title, price: data.price, description: data.description };
-        listingQueue[activeQueueIdx].status = 'Draft Ready';
+      if (window.activeQueueIdx >= 0 && listingQueue[window.activeQueueIdx]) {
+        listingQueue[window.activeQueueIdx].draft = { title: data.title, price: data.price, description: data.description };
+        listingQueue[window.activeQueueIdx].status = 'Draft Ready';
         renderListingQueue();
       }
     } else {
@@ -5322,18 +5322,20 @@ function getListingComicsString() {
 
 
 // ── LISTING QUEUE ────────────────────────────────────
-let listingQueue = [];
-let activeQueueIdx = -1;
+window.listingQueue = window.listingQueue || [];
+window.window.activeQueueIdx = window.window.activeQueueIdx !== undefined ? window.window.activeQueueIdx : -1;
+const getListingQueue = () => window.listingQueue;
+const getActiveIdx = () => window.window.activeQueueIdx;
 
 function renderListingQueue() {
-  document.getElementById('queue-count').textContent = listingQueue.length;
+  document.getElementById('queue-count').textContent = window.listingQueue.length;
   const list = document.getElementById('listing-queue-list');
-  if (!listingQueue.length) {
+  if (!window.listingQueue.length) {
     list.innerHTML = '<p style="font-size:13px;color:#6c757d">No bundles queued. Send from Bundles tab.</p>';
     return;
   }
-  list.innerHTML = listingQueue.map((item, idx) => {
-    const isActive = idx === activeQueueIdx;
+  list.innerHTML = window.listingQueue.map((item, idx) => {
+    const isActive = idx === window.activeQueueIdx;
     const statusColor = item.status === 'Published' ? '#198754' : item.status === 'Draft Ready' ? '#0066cc' : item.status === 'Photos Added' ? '#fd7e14' : '#6c757d';
     return '<div onclick="activateQueueItem(' + idx + ')" style="display:flex;justify-content:space-between;align-items:center;padding:8px;margin-bottom:4px;border-radius:6px;cursor:pointer;border:2px solid ' + (isActive ? '#0066cc' : '#dee2e6') + ';background:' + (isActive ? '#e8f4fd' : '#fff') + '">' +
       '<div>' +
@@ -5346,8 +5348,8 @@ function renderListingQueue() {
 }
 
 function activateQueueItem(idx) {
-  activeQueueIdx = idx;
-  const item = listingQueue[idx];
+  window.activeQueueIdx = idx;
+  const item = window.listingQueue[idx];
   
   // Update banner
   document.getElementById('active-listing-banner').style.display = 'block';
@@ -5365,7 +5367,7 @@ function activateQueueItem(idx) {
     '<div style="font-size:12px;color:#6c757d;margin-top:4px">' + item.variantSummary + '</div>';
   
   // If standard bundle and we have photos from premium, offer to reuse
-  if (!item.isPremium && listingQueue[0] && listingQueue[0].photos && listingQueue[0].photos.length) {
+  if (!item.isPremium && window.listingQueue[0] && window.listingQueue[0].photos && window.listingQueue[0].photos.length) {
     showStatus('listing-status', 'Tip: This is a standard bundle. You can reuse photos from Bundle 1 or upload new ones.', 'loading');
   } else {
     showStatus('listing-status', 'Bundle loaded - upload photos then generate listing', 'success');
@@ -5394,19 +5396,19 @@ function activateQueueItem(idx) {
 }
 
 function saveActiveQueuePhotos() {
-  if (activeQueueIdx >= 0 && listingQueue[activeQueueIdx]) {
-    listingQueue[activeQueueIdx].photos = [...listingPhotos];
-    if (listingPhotos.length > 0 && listingQueue[activeQueueIdx].status === 'Pending') {
-      listingQueue[activeQueueIdx].status = 'Photos Added';
+  if (window.activeQueueIdx >= 0 && listingQueue[window.activeQueueIdx]) {
+    listingQueue[window.activeQueueIdx].photos = [...listingPhotos];
+    if (listingPhotos.length > 0 && listingQueue[window.activeQueueIdx].status === 'Pending') {
+      listingQueue[window.activeQueueIdx].status = 'Photos Added';
       renderListingQueue();
     }
   }
 }
 
 function reuseStandardPhotos() {
-  if (listingQueue[0] && listingQueue[0].photos && listingQueue[0].photos.length) {
+  if (window.listingQueue[0] && window.listingQueue[0].photos && window.listingQueue[0].photos.length) {
     // Copy photos from bundle 1 but exclude ratio-only photos
-    listingPhotos = [...listingQueue[0].photos];
+    listingPhotos = [...window.listingQueue[0].photos];
     renderListingPhotoGrid();
     showStatus('listing-status', 'Photos copied from Bundle 1 - remove any ratio variant photos that don\'t apply', 'success');
   }
@@ -5473,7 +5475,7 @@ function agent2BuildDraftByKey(safeKey) {
   // Add to queue
   const queueItem = {
     id: safeKey + '_' + Date.now(),
-    name: bundleData.series + ' #' + bundleData.issue + (isPremium ? ' — Premium Bundle' : ' — Standard Bundle ' + (listingQueue.filter(i => !i.isPremium).length + 1)),
+    name: bundleData.series + ' #' + bundleData.issue + (isPremium ? ' — Premium Bundle' : ' — Standard Bundle ' + (window.listingQueue.filter(i => !i.isPremium).length + 1)),
     comicCount,
     isPremium,
     status: 'Pending',
@@ -5483,17 +5485,17 @@ function agent2BuildDraftByKey(safeKey) {
     draft: null
   };
   
-  listingQueue.push(queueItem);
+  window.listingQueue.push(queueItem);
   renderListingQueue();
 
   // Switch to listings tab and activate this item
   switchTab('listings');
-  activateQueueItem(listingQueue.length - 1);
+  activateQueueItem(window.listingQueue.length - 1);
 
   // Show confirmation in bundle planner
   const statusEl = document.getElementById('draft-status-' + safeKey);
   if (statusEl) {
-    statusEl.innerHTML = '<span style="color:#198754;font-size:12px">✓ Added to listing queue (' + listingQueue.length + ' total)</span>';
+    statusEl.innerHTML = '<span style="color:#198754;font-size:12px">✓ Added to listing queue (' + window.listingQueue.length + ' total)</span>';
   }
 }
 
