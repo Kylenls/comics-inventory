@@ -1529,6 +1529,8 @@ async function processImageBase64(base64, mediaType, mode) {
 
 }
 
+let savedLogoImg = null;
+
 function switchTab(tab) {
   if (typeof initLogo === 'function' && !savedLogoImg) initLogo();
   const tabs = ['add','invoice','foc','import','inventory','pc','bundles','update','ebay','listings','agents'];
@@ -3751,7 +3753,7 @@ async function saveBundlePlan() {
 }
 
 // ── AGENT 2 ──────────────────────────────────────────
-async // ── BUNDLE STAGING ───────────────────────────────────
+// ── BUNDLE STAGING ───────────────────────────────────
 let stagedBundles = [];
 
 function renderStagedBar() {
@@ -5238,7 +5240,6 @@ async function cleanAllListingPhotos() {
 
 
 // ── LOGO / WATERMARK ─────────────────────────────────
-let savedLogoImg = null;
 
 function initLogo() {
   const saved = localStorage.getItem('arc2_logo_base64');
