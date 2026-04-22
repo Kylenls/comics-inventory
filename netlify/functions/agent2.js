@@ -1,12 +1,13 @@
 const Anthropic = require('@anthropic-ai/sdk');
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_KEY });
-const DISCORD_WEBHOOK = process.env.DISCORD_WEBHOOK_MARKET;
+const DISCORD_WEBHOOK_MARKET = process.env.DISCORD_WEBHOOK_MARKET;
+const DISCORD_WEBHOOK_LISTINGS = process.env.DISCORD_WEBHOOK_LISTINGS;
 
-async function postToDiscord(message) {
-  if (!DISCORD_WEBHOOK) return;
+async function postToDiscord(webhook, message) {
+  if (!webhook) return;
   try {
-    await fetch(DISCORD_WEBHOOK, {
+    await fetch(webhook, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ content: message })
@@ -36,7 +37,6 @@ exports.handler = async (event) => {
 
       const comicCount = parseInt(count) || 1;
 
-      // Shipping tier based on comic count
       let shippingCost;
       let shippingNote;
       if (comicCount <= 9) {
@@ -54,7 +54,6 @@ exports.handler = async (event) => {
       }
 
       const bagBoard = comicCount * 0.15;
-      const ebayFeeRate = 0.13;
 
       const prompt = `You are Taskmaster, an expert eBay comic book seller for ARC2 (Aged Readers Comics Collective). Your job is to write highly optimized eBay listings and set profitable, competitive prices.
 
@@ -107,7 +106,7 @@ Title (max 80 chars):
 
 Description (4 paragraphs):
 1. What's in this listing and why it's special/valuable
-2. Key issue significance or variant details  
+2. Key issue significance or variant details
 3. Condition: brand new, unread, individually bagged and boarded
 4. Shipping: free shipping, carefully packaged in a rigid mailer, same or next business day dispatch
 
@@ -151,6 +150,7 @@ Return ONLY a JSON object with no other text:
       }
 
       await postToDiscord(
+        DISCORD_WEBHOOK_LISTINGS,
         `🏷️ **New Listing Draft — ARC2**\n` +
         `Title: ${listing.title}\n` +
         `Price: $${listing.price} (free shipping)\n` +
@@ -163,8 +163,11 @@ Return ONLY a JSON object with no other text:
     }
 
     if (action === 'publish_listing') {
-      const { title, price, description } = body;
-      await postToDiscord(`📦 **Listing Published to eBay**\nTitle: ${title}\nPrice: $${price} (free shipping)`);
+      const { title, price } = body;
+      await postToDiscord(
+        DISCORD_WEBHOOK_LISTINGS,
+        `📦 **Listing Published to eBay**\nTitle: ${title}\nPrice: $${price} (free shipping)`
+      );
       return {
         statusCode: 200, headers,
         body: JSON.stringify({
