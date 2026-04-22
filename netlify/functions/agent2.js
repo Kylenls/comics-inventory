@@ -33,8 +33,7 @@ exports.handler = async (event) => {
     const { action } = body;
 
     if (action === 'generate_listing') {
-      const { comics, count, mode, comicDetails, coverPriceTotal } = body;
-
+      const { comics, count, mode, coverPriceTotal } = body;
       const comicCount = parseInt(count) || 1;
 
       let shippingCost;
@@ -54,83 +53,58 @@ exports.handler = async (event) => {
       }
 
       const bagBoard = comicCount * 0.15;
+      const coverPrice = parseFloat(coverPriceTotal) || (comicCount * 3.99);
 
-      const prompt = `You are Taskmaster, an expert eBay comic book seller for ARC2 (Aged Readers Comics Collective). Your job is to write highly optimized eBay listings and set profitable, competitive prices.
+      const breakEven = (shippingCost + bagBoard + coverPrice) / 0.87;
+      const floor = (breakEven * 1.05).toFixed(2);
+      const target = (breakEven * 1.10).toFixed(2);
+
+      const prompt = `You are Taskmaster, an expert eBay comic book seller for ARC2 (Aged Readers Comics Collective). Write a highly optimized eBay listing.
 
 Comics to list:
 ${comics}
 
-${comicDetails ? 'Additional details from inventory:\n' + comicDetails : ''}
-
 Listing type: ${mode === 'single' ? 'Single issue' : 'Bundle of ' + comicCount + ' comics'}
-Comic count: ${comicCount}
 
-STEP 1 - RESEARCH (use web search):
-- Search eBay SOLD listings (not active) for each comic in the last 90 days
-- Note the median sold price and price range for comparable NM copies
-- Find if any are key issues (first appearances, deaths, major events, origin stories)
-- Find variant significance (ratio variants 1:10, 1:25, 1:50 command premiums)
-- Note keywords from highest-performing sold listings
+PRICING (already calculated for you):
+- Shipping cost (baked into free shipping price): $${shippingCost.toFixed(2)} (${shippingNote})
+- Bag and board: $${bagBoard.toFixed(2)}
+- Cover price total: $${coverPrice.toFixed(2)}
+- Break-even listing price: $${breakEven.toFixed(2)}
+- Floor price (5% margin minimum): $${floor}
+- Target price (10% margin): $${target}
+- Use target price unless you know market data suggests higher
+- Price must end in .99 or .95
+- All listings show FREE SHIPPING
 
-STEP 2 - PRICING CALCULATION:
-Our costs (already calculated for you):
-- Shipping + label (baked into "free shipping" price): $${shippingCost.toFixed(2)} (${shippingNote})
-- Bag and board: $${bagBoard.toFixed(2)} ($0.15 x ${comicCount} comics)
-- eBay fee: 13% of final sale price
-${coverPriceTotal ? '- Total cover price of comics: $' + coverPriceTotal : '- Note: cover price total not provided, estimate from comic details'}
-
-Calculate break-even listing price:
-  break_even = (shipping + bag_board + cover_price_total) / (1 - 0.13)
-
-Then calculate:
-  floor_price = break_even * 1.05  (minimum 5% margin - do not go below this)
-  target_price = break_even * 1.10  (standard 10% margin)
-
-Pricing decision:
-- Search eBay sold listings for median sold price
-- market_price = median_sold * 0.97  (3% below median to be most competitive)
-- IF market_price > target_price: use market_price (take the higher margin)
-- IF market_price is between floor and target: use target_price
-- IF market_price < floor_price OR no market data found: use target_price
-- NEVER go below floor_price
-- ${comicCount > 25 ? 'FLAG: This bundle requires custom shipping quote - do not calculate shipping into price' : ''}
-- Price should end in .99 or .95
-
-STEP 3 - WRITE THE LISTING:
-All listings show FREE SHIPPING - shipping cost is baked into our price, never shown to buyer.
-
-Title (max 80 chars):
-- Lead with most valuable/recognizable comic
-- Include: series, issue #, variant letter, key status, NM, publisher
+LISTING RULES:
+- Title: max 80 characters, keyword-rich
+- Include: series name, issue #, variant letters, key issue status if applicable, NM condition, publisher
 - Power keywords: LOT SET RUN VARIANT 1ST KEY NM UNREAD HTF RATIO
-
-Description (4 paragraphs):
-1. What's in this listing and why it's special/valuable
-2. Key issue significance or variant details
-3. Condition: brand new, unread, individually bagged and boarded
-4. Shipping: free shipping, carefully packaged in a rigid mailer, same or next business day dispatch
+- If ratio variants are listed (1:10, 1:25 etc) — highlight them prominently in title and description
+- Description: 4 paragraphs:
+  1. What's in this listing and why it's valuable/collectible
+  2. Variant details and any key issue significance
+  3. Condition: brand new, unread, individually bagged and boarded day of receipt
+  4. Shipping: free shipping, rigid mailer, same or next business day dispatch
 
 Return ONLY a JSON object with no other text:
 {
   "title": "listing title max 80 chars",
-  "price": 57.99,
+  "price": ${target},
   "description": "full 4 paragraph description",
   "keywords": ["keyword1", "keyword2"],
-  "keyIssueNotes": "key issue significance found",
-  "pricingRationale": "break_even=$X, floor=$X, target=$X, market_median=$X, final=$X"
+  "keyIssueNotes": "any key issue or variant significance",
+  "pricingRationale": "break_even=$${breakEven.toFixed(2)}, floor=$${floor}, target=$${target}, final=based on target"
 }`;
 
       const message = await client.messages.create({
         model: 'claude-haiku-4-5-20251001',
-        max_tokens: 3000,
+        max_tokens: 1500,
         messages: [{ role: 'user', content: prompt }]
       });
 
-      let text = '';
-      for (const block of message.content) {
-        if (block.type === 'text') text += block.text;
-      }
-
+      const text = message.content[0].text;
       let listing;
       try {
         const clean = text.trim().replace(/```json\n?/g, '').replace(/```\n?/g, '');
@@ -153,7 +127,7 @@ Return ONLY a JSON object with no other text:
         `🏷️ **New Listing Draft — ARC2**\n` +
         `Title: ${listing.title}\n` +
         `Price: $${listing.price} (free shipping)\n` +
-        `Comics: ${comicCount} | Shipping tier: ${shippingNote}\n` +
+        `Comics: ${comicCount} | ${shippingNote}\n` +
         `Pricing: ${listing.pricingRationale || 'see app'}\n` +
         `${listing.keyIssueNotes ? 'Key issue: ' + listing.keyIssueNotes : ''}`
       );
