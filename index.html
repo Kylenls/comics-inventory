@@ -1144,37 +1144,65 @@
   <!-- AGENTS -->
 
   <div class="panel" id="panel-listings">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;height:calc(100vh - 120px)">
+    <div style="display:grid;grid-template-columns:45% 55%;gap:16px;min-height:calc(100vh - 120px)">
 
-      <!-- LEFT: PLAN & BUILD -->
-      <div style="overflow-y:auto;display:flex;flex-direction:column;gap:12px">
-
-        <!-- Invoice Loader -->
-        <div class="card">
-          <div class="defaults-title" style="font-size:11px;margin-bottom:8px">INVOICE LOOKUP</div>
-          <div style="display:flex;gap:8px">
-            <input type="text" id="lgen-invoice" placeholder="Invoice number e.g. 827969" style="flex:1;padding:8px;border:1px solid #dee2e6;border-radius:6px;font-size:13px" />
-            <button class="btn btn-primary" onclick="lgenLoadInvoice()" style="white-space:nowrap">Load</button>
-          </div>
-          <div class="status" id="lgen-load-status" style="margin-top:8px"></div>
+      <!-- LEFT: PLAN & QUEUE -->
+      <div style="overflow-y:auto;padding-right:8px">
+<div class="card">
+      <div class="defaults-title" style="font-size:13px;font-weight:600;color:#212529;margin-bottom:4px">📦 Bundle Planner</div>
+      <p style="font-size:13px;color:#666;margin-bottom:12px">Plan eBay bundles, Whatnot singles, and solo listings. Load an invoice to see what you ordered and plan how to sell it.</p>
+      <div class="row">
+        <div class="field">
+          <label>Invoice Number</label>
+          <input type="text" id="lgen-invoice" placeholder="e.g. 1676011" />
         </div>
-
-        <!-- Bundle List -->
-        <div class="card" id="lgen-bundles-card" style="display:none">
-          <div class="defaults-title" style="font-size:11px;margin-bottom:8px">BUNDLES <span id="lgen-bundle-count"></span></div>
-          <div id="lgen-bundle-list"></div>
+        <div class="field" style="display:flex;align-items:flex-end">
+          <button onclick="lgenLoadBundles()" class="btn btn-primary" style="width:100%">Load Invoice</button>
         </div>
+      </div>
+      <div class="status" id="lgen-load-status"></div>
+    </div>
 
+    <div id="lgen-planner-results" style="display:none">
+      <div class="card" style="background:linear-gradient(135deg,#185FA5,#7B3FB5);color:white;margin-bottom:0.75rem">
+        <div style="font-size:11px;opacity:0.8;margin-bottom:4px">BUNDLE PLAN SUMMARY</div>
+        <div id="lgen-summary-text" style="font-size:14px;font-weight:600"></div>
+        <div id="lgen-summary-sub" style="font-size:12px;opacity:0.9;margin-top:2px"></div>
+      </div>
+      <div id="lgen-series-list"></div>
+      <button onclick="saveBundlePlan()" class="btn btn-primary" style="width:100%;margin-top:0.5rem">💾 Save Bundle Plan to Airtable</button>
+      <div class="status" id="bundle-save-status"></div>
+    </div>
+  </div>
+
+
+    <div class="card" style="margin-top:1rem">
+      <div class="defaults-title" style="font-size:13px;font-weight:600;color:#212529;margin-bottom:4px">🔗 Quick Bundle Builder</div>
+      <p style="font-size:13px;color:#666;margin-bottom:12px">Search inventory and add any comics to a custom bundle for listing.</p>
+      <div class="field">
+        <label>Search Comics</label>
+        <input type="text" id="qb-search" placeholder="Series, SKU, or keyword..." oninput="quickBundleSearch()" style="width:100%;padding:8px;border:1px solid #dee2e6;border-radius:6px;font-size:13px" />
+      </div>
+      <div id="qb-results" style="max-height:200px;overflow-y:auto;margin-bottom:12px"></div>
+      <div class="defaults-title" style="font-size:11px;margin-bottom:8px">BUNDLE QUEUE (<span id="qb-count">0</span> comics)</div>
+      <div id="qb-queue" style="max-height:200px;overflow-y:auto;margin-bottom:12px"></div>
+      <div class="row">
+        <div class="field">
+          <label>Bundle Name</label>
+          <input type="text" id="qb-name" placeholder="e.g. Indie Horror Lot" style="padding:8px;border:1px solid #dee2e6;border-radius:6px;font-size:13px;width:100%" />
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="sendBundleToListings()" style="width:100%">Send to eBay Listing Generator</button>
+      <div class="status" id="qb-status"></div>
+    </div>
         <!-- Queue -->
-        <div class="card">
-          <div class="defaults-title" style="font-size:11px;margin-bottom:8px">QUEUE (<span id="lgen-queue-count">0</span> listings)</div>
-          <div id="lgen-queue-list">
-            <p style="font-size:13px;color:#6c757d">No listings queued yet.</p>
-          </div>
+        <div class="card" style="margin-top:12px">
+          <div class="defaults-title" style="font-size:11px;margin-bottom:8px">LISTING QUEUE (<span id="lgen-queue-count">0</span>)</div>
+          <div id="lgen-queue-list"><p style="font-size:13px;color:#6c757d">No listings queued yet.</p></div>
         </div>
 
         <!-- Manual Add -->
-        <div class="card">
+        <div class="card" style="margin-top:12px">
           <div class="defaults-title" style="font-size:11px;margin-bottom:8px">ADD MANUALLY</div>
           <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:6px;margin-bottom:6px">
             <input type="text" id="lgen-manual-title" placeholder="Series title" style="padding:8px;border:1px solid #dee2e6;border-radius:6px;font-size:13px" />
@@ -1183,25 +1211,24 @@
           </div>
           <button class="btn btn-secondary" onclick="lgenAddManual()" style="width:100%;font-size:13px">+ Add to Queue</button>
         </div>
-
       </div>
 
       <!-- RIGHT: FINALIZE -->
-      <div style="overflow-y:auto;display:flex;flex-direction:column;gap:12px">
+      <div style="overflow-y:auto">
 
         <!-- Active Bundle Banner -->
-        <div class="card" id="lgen-active-card">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center">
             <div>
               <div style="font-size:13px;font-weight:700" id="lgen-active-name">No active listing</div>
-              <div style="font-size:11px;color:#6c757d" id="lgen-active-detail">Select a bundle from the queue to begin</div>
+              <div style="font-size:11px;color:#6c757d" id="lgen-active-detail">Queue a bundle on the left to begin</div>
             </div>
             <span id="lgen-active-badge" style="font-size:11px;padding:3px 10px;border-radius:10px;background:#f0f0f0;color:#6c757d">Pending</span>
           </div>
         </div>
 
         <!-- Watermark Logo -->
-        <div class="card">
+        <div class="card" style="margin-top:12px">
           <div class="defaults-title" style="font-size:11px;margin-bottom:8px">WATERMARK LOGO</div>
           <div style="display:flex;align-items:center;gap:10px">
             <div id="logo-preview-listing" style="font-size:13px;color:#6c757d">No logo uploaded</div>
@@ -1212,7 +1239,7 @@
         </div>
 
         <!-- Photos -->
-        <div class="card">
+        <div class="card" style="margin-top:12px">
           <div class="defaults-title" style="font-size:11px;margin-bottom:8px">PHOTOS (<span id="listing-photo-count">0</span> uploaded)</div>
           <div class="drop-zone" id="listing-drop-zone"
             ondrop="handleListingDrop(event)" ondragover="event.preventDefault()"
@@ -1230,14 +1257,14 @@
         </div>
 
         <!-- Collage Preview -->
-        <div class="card" id="listing-collage-card" style="display:none">
+        <div class="card" id="listing-collage-card" style="display:none;margin-top:12px">
           <div class="defaults-title" style="font-size:11px;margin-bottom:8px">COLLAGE PREVIEW</div>
           <canvas id="listing-canvas" style="width:100%;border-radius:8px"></canvas>
           <button class="btn btn-secondary" onclick="downloadCollage()" style="width:100%;margin-top:8px;font-size:12px">Download Collage</button>
         </div>
 
         <!-- Draft -->
-        <div class="card">
+        <div class="card" style="margin-top:12px">
           <div class="defaults-title" style="font-size:11px;margin-bottom:8px">LISTING DRAFT</div>
           <input type="text" id="listing-title" placeholder="Title (auto-filled by Taskmaster)" style="width:100%;padding:8px;border:1px solid #dee2e6;border-radius:6px;font-size:13px;margin-bottom:6px" />
           <div style="display:flex;gap:8px;margin-bottom:6px">
@@ -5313,89 +5340,19 @@ function getListingComicsString() {
 }
 
 
-// ── LISTING GENERATOR v2 ─────────────────────────────
+
+
+// ── LGEN BUNDLE WRAPPER ───────────────────────────────
 window._arc2Queue = window._arc2Queue || [];
 window._arc2ActiveIdx = -1;
 
-function lgenRenderQueue() {
-  const list = document.getElementById('lgen-queue-list');
-  const count = document.getElementById('lgen-queue-count');
-  if (!list) return;
-  count.textContent = window._arc2Queue.length;
-  if (!window._arc2Queue.length) {
-    list.innerHTML = '<p style="font-size:13px;color:#6c757d">No listings queued yet.</p>';
-    return;
-  }
-  list.innerHTML = window._arc2Queue.map((item, idx) => {
-    const isActive = idx === window._arc2ActiveIdx;
-    const statusColor = item.status === 'Done' ? '#198754' : item.status === 'Draft Ready' ? '#0066cc' : '#6c757d';
-    return '<div onclick="lgenActivate(' + idx + ')" style="display:flex;justify-content:space-between;align-items:center;padding:8px;margin-bottom:4px;border-radius:6px;cursor:pointer;border:2px solid ' + (isActive ? '#0066cc' : '#dee2e6') + ';background:' + (isActive ? '#e8f4fd' : '#fff') + '">' +
-      '<div>' +
-      '<div style="font-size:13px;font-weight:600">' + item.name + '</div>' +
-      '<div style="font-size:11px;color:#6c757d">' + (item.comicCount || '?') + ' comics</div>' +
-      '</div>' +
-      '<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:' + statusColor + '20;color:' + statusColor + '">' + item.status + '</span>' +
-      '</div>';
-  }).join('');
-}
-
-function lgenActivate(idx) {
-  window._arc2ActiveIdx = idx;
-  const item = window._arc2Queue[idx];
-  if (!item) return;
-
-  // Update banner
-  const nameEl = document.getElementById('lgen-active-name');
-  const detailEl = document.getElementById('lgen-active-detail');
-  const badgeEl = document.getElementById('lgen-active-badge');
-  if (nameEl) nameEl.textContent = item.name;
-  if (detailEl) detailEl.textContent = item.comicsString || '';
-  if (badgeEl) {
-    badgeEl.textContent = item.status;
-    badgeEl.style.background = item.isPremium ? '#F0E8FA' : '#E8F8F3';
-    badgeEl.style.color = item.isPremium ? '#7B3FB5' : '#198754';
-  }
-
-  // Restore photos
-  listingPhotos = item.photos || [];
-  renderListingPhotoGrid();
-
-  // Restore draft
-  const titleEl = document.getElementById('listing-title');
-  const priceEl = document.getElementById('listing-price');
-  const descEl = document.getElementById('listing-description');
-  if (item.draft) {
-    if (titleEl) titleEl.value = item.draft.title || '';
-    if (priceEl) priceEl.value = item.draft.price || '';
-    if (descEl) descEl.value = item.draft.description || '';
-  } else {
-    if (titleEl) titleEl.value = '';
-    if (priceEl) priceEl.value = '';
-    if (descEl) descEl.value = '';
-  }
-
-  lgenRenderQueue();
-}
-
-function lgenAddToQueue(item) {
-  // Check if already in queue by name
-  const existing = window._arc2Queue.findIndex(q => q.name === item.name);
-  if (existing >= 0) {
-    window._arc2Queue[existing] = item;
-  } else {
-    window._arc2Queue.push(item);
-  }
-  lgenRenderQueue();
-  // Auto-activate if first item
-  if (window._arc2Queue.length === 1) lgenActivate(0);
-}
-
-async function lgenLoadInvoice() {
+function lgenLoadBundles() {
+  // Copy invoice value and call existing loadBundlePlanner logic
   const invoice = document.getElementById('lgen-invoice').value.trim();
   if (!invoice) return;
   showStatus('lgen-load-status', 'Loading invoice...', 'loading');
 
-  try {
+  (async () => {
     let allRecords = [];
     let offset = null;
     do {
@@ -5420,74 +5377,174 @@ async function lgenLoadInvoice() {
       return;
     }
 
-    // Group by Series+Issue
-    const groups = {};
+    // Use same grouping logic as bundle planner
+    const bySeries = {};
     forSale.forEach(r => {
-      const series = (r.fields['Series'] || '').trim();
+      let series = (r.fields['Series'] || 'Unknown').trim();
+      series = series.replace(/\s+CVR\s+[A-Z].*$/i, '').trim();
       const issue = (r.fields['Issue'] || '').toString().trim();
-      const key = series + ' #' + issue;
-      if (!groups[key]) groups[key] = { key, series, issue, skus: [] };
+      const key = issue ? series + ' #' + issue : series;
+      if (!bySeries[key]) bySeries[key] = { key, series, issue, publisher: r.fields['Publisher'] || '', skus: [] };
       const variant = (r.fields['Variant'] || '').trim().toUpperCase();
       const variantDesc = (r.fields['Variant Description'] || '');
-      const isRatio = variantDesc.toLowerCase().includes('1:') || variantDesc.toLowerCase().includes('inc ') || variantDesc.toLowerCase().includes('incentive');
-      groups[key].skus.push({
+      const vdLower = variantDesc.toLowerCase();
+      const isBlindBag = vdLower.includes('blind bag') || vdLower.includes('mystery');
+      const isRatio = vdLower.includes('1:') || vdLower.includes('inc ') || vdLower.includes('incentive');
+      bySeries[key].skus.push({
         id: r.id, sku: r.fields['SKU'], variant, variantDesc,
         coverPrice: parseFloat(r.fields['Cover Price'] || 0),
         purchasePrice: parseFloat(r.fields['Purchase Price'] || 0),
-        isRatio, assignment: 'single'
+        isBlindBag, isRatio, assignment: 'single-ebay'
       });
     });
 
-    // Render bundle list
-    const bundleCard = document.getElementById('lgen-bundles-card');
-    const bundleList = document.getElementById('lgen-bundle-list');
-    const bundleCount = document.getElementById('lgen-bundle-count');
-    bundleCard.style.display = 'block';
-    bundleCount.textContent = '(' + Object.keys(groups).length + ' titles)';
+    // Calculate bundles same as bundle planner
+    Object.values(bySeries).forEach(group => {
+      const nonBlind = group.skus.filter(s => !s.isBlindBag);
+      const blindBags = group.skus.filter(s => s.isBlindBag);
+      const byVariant = {};
+      nonBlind.forEach(s => {
+        if (!byVariant[s.variant]) byVariant[s.variant] = [];
+        byVariant[s.variant].push(s);
+      });
+      const variants = Object.keys(byVariant);
+      const hasCvrA = variants.includes('A');
+      const otherVariants = variants.filter(v => v !== 'A' && v !== '' && v !== 'R');
+      const isBundle = hasCvrA && otherVariants.length > 0;
+      const minQty = isBundle ? Math.min(...variants.map(v => byVariant[v].length)) : 0;
+      const ratioVariant = variants.find(v => byVariant[v][0] && byVariant[v][0].isRatio);
+      group.isBundle = isBundle;
+      group.bundleCount = minQty;
+      group.variants = byVariant;
+      group.variantList = variants.sort();
+      group.ratioVariant = ratioVariant || null;
+      group.blindBags = blindBags;
+      group.coverTotal = nonBlind.reduce((s, c) => s + c.coverPrice, 0);
+    });
 
-    bundleList.innerHTML = Object.values(groups).map(g => {
-      const safeKey = g.key.replace(/[^a-z0-9]/gi, '-');
-      const variants = [...new Set(g.skus.map(s => s.variant))].sort();
-      const coverTotal = g.skus.reduce((sum, s) => sum + s.coverPrice, 0);
-      const hasRatio = g.skus.some(s => s.isRatio);
-      return '<div style="padding:10px;border:1px solid #dee2e6;border-radius:8px;margin-bottom:8px">' +
-        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">' +
-        '<div>' +
-        '<div style="font-size:13px;font-weight:700">' + g.key + '</div>' +
-        '<div style="font-size:11px;color:#6c757d">CVR ' + variants.join(', ') + (hasRatio ? ' ⭐' : '') + ' | ' + g.skus.length + ' copies | $' + coverTotal.toFixed(2) + ' cover total</div>' +
-        '</div>' +
-        '<button onclick="lgenStageBundle(this)" data-key="' + g.key + '" data-series="' + g.series + '" data-issue="' + g.issue + '" data-cover="' + coverTotal.toFixed(2) + '" data-count="' + g.skus.length + '" data-variants="' + variants.join(',') + '" data-premium="' + hasRatio + '" class="btn btn-primary" style="font-size:12px;white-space:nowrap">+ Queue</button>' +
-        '</div>' +
-        '</div>';
-    }).join('');
-
-    showStatus('lgen-load-status', forSale.length + ' comics loaded across ' + Object.keys(groups).length + ' titles', 'success');
-
-  } catch(e) {
-    showStatus('lgen-load-status', 'Error: ' + e.message, 'error');
-  }
+    window._lgenBySeries = bySeries;
+    lgenRenderBundles(bySeries);
+    showStatus('lgen-load-status', forSale.length + ' comics loaded', 'success');
+    document.getElementById('lgen-planner-results').style.display = 'block';
+    document.getElementById('lgen-summary-text').textContent = Object.keys(bySeries).length + ' titles loaded';
+  })();
 }
 
-function lgenStageBundle(btn) {
-  if (!btn) return;
-  const series = btn.dataset.series;
-  const issue = btn.dataset.issue;
-  const coverTotal = parseFloat(btn.dataset.cover);
-  const comicCount = parseInt(btn.dataset.count);
-  const variants = btn.dataset.variants;
-  const isPremium = btn.dataset.premium === 'true';
-  const name = series + ' #' + issue + (isPremium ? ' — Premium' : '');
-  const comicsString = series + ' #' + issue + ' CVR ' + variants;
-
-  lgenAddToQueue({
-    name, comicsString, comicCount, isPremium,
-    coverTotal, status: 'Pending',
-    photos: [], draft: null
+function lgenRenderBundles(bySeries) {
+  const list = document.getElementById('lgen-series-list');
+  if (!list) return;
+  let html = '';
+  Object.values(bySeries).forEach(g => {
+    if (!g.isBundle) return;
+    const safeKey = g.key.replace(/[^a-z0-9]/gi, '-');
+    const variants = g.variantList.join(', ');
+    html += '<div class="card" style="margin-bottom:8px">';
+    html += '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">';
+    html += '<div>';
+    html += '<div style="font-size:13px;font-weight:700">' + g.key + '</div>';
+    html += '<div style="font-size:11px;color:#6c757d">CVR ' + variants + (g.ratioVariant ? ' ⭐ Ratio CVR ' + g.ratioVariant : '') + '</div>';
+    html += '<div style="font-size:11px;color:#6c757d">' + g.bundleCount + ' bundle(s) | $' + g.coverTotal.toFixed(2) + ' cover total</div>';
+    html += '</div></div>';
+    // Bundle slot buttons
+    for (let b = 1; b <= g.bundleCount; b++) {
+      const isPremium = b === 1 && !!g.ratioVariant;
+      const bundleName = g.key + (isPremium ? ' — Premium' : ' — Bundle ' + b);
+      const variantCount = g.variantList.length + (isPremium ? 0 : (g.ratioVariant ? -1 : 0));
+      const coverSlice = g.variantList.reduce((sum, v) => {
+        const sku = g.variants[v] && g.variants[v][b-1];
+        return sum + (sku ? sku.coverPrice : 0);
+      }, 0);
+      html += '<button onclick="lgenQueueBundle(this)" ';
+      html += 'data-name="' + bundleName + '" ';
+      html += 'data-comics="' + g.key + ' CVR ' + g.variantList.join(', ') + (isPremium ? ' (incl. ratio variant)' : '') + '" ';
+      html += 'data-count="' + variantCount + '" ';
+      html += 'data-cover="' + coverSlice.toFixed(2) + '" ';
+      html += 'data-premium="' + isPremium + '" ';
+      html += 'class="btn btn-primary" style="width:100%;margin-bottom:4px;font-size:12px;text-align:left">';
+      html += (isPremium ? '⭐ ' : '📦 ') + 'Queue: ' + bundleName;
+      html += '</button>';
+    }
+    html += '</div>';
   });
+  if (!html) html = '<p style="font-size:13px;color:#6c757d">No bundle titles found in this invoice.</p>';
+  list.innerHTML = html;
+}
 
-  btn.textContent = '✓ Queued';
+function lgenQueueBundle(btn) {
+  if (!btn) return;
+  const name = btn.dataset.name;
+  const comicsString = btn.dataset.comics;
+  const comicCount = parseInt(btn.dataset.count) || 5;
+  const coverTotal = parseFloat(btn.dataset.cover) || 0;
+  const isPremium = btn.dataset.premium === 'true';
+
+  lgenAddToQueue({ name, comicsString, comicCount, isPremium, coverTotal, status: 'Pending', photos: [], draft: null });
+  btn.textContent = '✓ Queued: ' + name;
   btn.disabled = true;
   btn.style.background = '#198754';
+  btn.style.borderColor = '#198754';
+}
+
+function lgenAddToQueue(item) {
+  const existing = window._arc2Queue.findIndex(q => q.name === item.name);
+  if (existing >= 0) {
+    window._arc2Queue[existing] = item;
+  } else {
+    window._arc2Queue.push(item);
+  }
+  lgenRenderQueue();
+  if (window._arc2Queue.length === 1) lgenActivate(0);
+}
+
+function lgenRenderQueue() {
+  const list = document.getElementById('lgen-queue-list');
+  const count = document.getElementById('lgen-queue-count');
+  if (!list) return;
+  if (count) count.textContent = window._arc2Queue.length;
+  if (!window._arc2Queue.length) {
+    list.innerHTML = '<p style="font-size:13px;color:#6c757d">No listings queued yet.</p>';
+    return;
+  }
+  list.innerHTML = window._arc2Queue.map((item, idx) => {
+    const isActive = idx === window._arc2ActiveIdx;
+    const statusColor = item.status === 'Done' ? '#198754' : item.status === 'Draft Ready' ? '#0066cc' : '#6c757d';
+    return '<div onclick="lgenActivate(' + idx + ')" style="display:flex;justify-content:space-between;align-items:center;padding:8px;margin-bottom:4px;border-radius:6px;cursor:pointer;border:2px solid ' + (isActive ? '#0066cc' : '#dee2e6') + ';background:' + (isActive ? '#e8f4fd' : '#fff') + '">' +
+      '<div><div style="font-size:13px;font-weight:600">' + item.name + '</div>' +
+      '<div style="font-size:11px;color:#6c757d">' + (item.comicCount || '?') + ' comics</div></div>' +
+      '<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:' + statusColor + '20;color:' + statusColor + '">' + item.status + '</span>' +
+      '</div>';
+  }).join('');
+}
+
+function lgenActivate(idx) {
+  window._arc2ActiveIdx = idx;
+  const item = window._arc2Queue[idx];
+  if (!item) return;
+  const nameEl = document.getElementById('lgen-active-name');
+  const detailEl = document.getElementById('lgen-active-detail');
+  const badgeEl = document.getElementById('lgen-active-badge');
+  if (nameEl) nameEl.textContent = item.name;
+  if (detailEl) detailEl.textContent = item.comicsString || '';
+  if (badgeEl) {
+    badgeEl.textContent = item.isPremium ? '⭐ Premium' : item.status;
+    badgeEl.style.background = item.isPremium ? '#F0E8FA' : '#E8F8F3';
+    badgeEl.style.color = item.isPremium ? '#7B3FB5' : '#198754';
+  }
+  listingPhotos = item.photos || [];
+  renderListingPhotoGrid();
+  const titleEl = document.getElementById('listing-title');
+  const priceEl = document.getElementById('listing-price');
+  const descEl = document.getElementById('listing-description');
+  if (item.draft) {
+    if (titleEl) titleEl.value = item.draft.title || '';
+    if (priceEl) priceEl.value = item.draft.price || '';
+    if (descEl) descEl.value = item.draft.description || '';
+  } else {
+    if (titleEl) titleEl.value = '';
+    if (priceEl) priceEl.value = '';
+    if (descEl) descEl.value = '';
+  }
+  lgenRenderQueue();
 }
 
 function lgenAddManual() {
@@ -5496,11 +5553,7 @@ function lgenAddManual() {
   const publisher = document.getElementById('lgen-manual-publisher').value.trim();
   if (!title) { alert('Please enter a series title'); return; }
   const name = title + (issue ? ' #' + issue : '') + (publisher ? ' (' + publisher + ')' : '');
-  lgenAddToQueue({
-    name, comicsString: name, comicCount: 1,
-    isPremium: false, coverTotal: 0, status: 'Pending',
-    photos: [], draft: null
-  });
+  lgenAddToQueue({ name, comicsString: name, comicCount: 1, isPremium: false, coverTotal: 0, status: 'Pending', photos: [], draft: null });
   document.getElementById('lgen-manual-title').value = '';
   document.getElementById('lgen-manual-issue').value = '';
   document.getElementById('lgen-manual-publisher').value = '';
@@ -5512,27 +5565,22 @@ function lgenReusePhotos() {
     renderListingPhotoGrid();
     showStatus('listing-status', 'Photos copied from first queue item', 'success');
   } else {
-    showStatus('listing-status', 'No photos found in first queue item', 'error');
+    showStatus('listing-status', 'No photos in first queue item yet', 'error');
   }
 }
 
 async function lgenGenerate() {
   const idx = window._arc2ActiveIdx;
   if (idx < 0 || !window._arc2Queue[idx]) {
-    showStatus('listing-status', 'No active listing selected', 'error');
+    showStatus('listing-status', 'No active listing - click a queue item first', 'error');
     return;
   }
   const item = window._arc2Queue[idx];
   showStatus('listing-status', 'Taskmaster is researching and writing your listing...', 'loading');
-
-  // Determine shipping tier
   const count = item.comicCount || 1;
-  const shipping = count <= 9 ? 12.99 : count <= 15 ? 15.99 : count <= 25 ? 19.99 : 0;
-
   try {
     const res = await fetch('/.netlify/functions/agent2', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         action: 'generate_listing',
         comics: item.comicsString,
@@ -5543,18 +5591,14 @@ async function lgenGenerate() {
     });
     const data = await res.json();
     if (!data.success) throw new Error(data.error || 'Generation failed');
-
     document.getElementById('listing-title').value = data.title || '';
     document.getElementById('listing-price').value = data.price || '';
     document.getElementById('listing-description').value = data.description || '';
-
-    // Save draft to queue item
     window._arc2Queue[idx].draft = { title: data.title, price: data.price, description: data.description };
     window._arc2Queue[idx].status = 'Draft Ready';
     window._arc2Queue[idx].photos = [...listingPhotos];
     lgenRenderQueue();
-
-    showStatus('listing-status', 'Draft ready - review and copy or mark done', 'success');
+    showStatus('listing-status', 'Draft ready - review, copy, or mark done', 'success');
   } catch(e) {
     showStatus('listing-status', 'Error: ' + e.message, 'error');
   }
@@ -5565,35 +5609,31 @@ function lgenCopyDraft() {
   const price = document.getElementById('listing-price').value;
   const desc = document.getElementById('listing-description').value;
   const text = 'TITLE: ' + title + '\n\nPRICE: $' + price + ' (Free Shipping)\n\nDESCRIPTION:\n' + desc;
-  navigator.clipboard.writeText(text).then(() => {
-    showStatus('listing-status', 'Copied to clipboard', 'success');
-  });
+  navigator.clipboard.writeText(text).then(() => showStatus('listing-status', 'Copied to clipboard', 'success'));
 }
 
 function lgenMarkDone() {
   const idx = window._arc2ActiveIdx;
   if (idx < 0 || !window._arc2Queue[idx]) return;
-
-  // Save current photos and draft
   window._arc2Queue[idx].photos = [...listingPhotos];
   const title = document.getElementById('listing-title').value;
   const price = document.getElementById('listing-price').value;
   const desc = document.getElementById('listing-description').value;
   if (title) window._arc2Queue[idx].draft = { title, price, description: desc };
   window._arc2Queue[idx].status = 'Done';
-
-  // Move to next pending
   const nextIdx = window._arc2Queue.findIndex((item, i) => i > idx && item.status !== 'Done');
   if (nextIdx >= 0) {
     lgenActivate(nextIdx);
-    // Clear photos for next item
-    listingPhotos = window._arc2Queue[nextIdx].photos || [];
-    renderListingPhotoGrid();
   } else {
     showStatus('listing-status', 'All listings complete!', 'success');
     window._arc2ActiveIdx = -1;
     lgenRenderQueue();
   }
+}
+
+function lgenCommitPlan() {
+  // Placeholder for future Airtable commit
+  showStatus('lgen-load-status', 'Plan saved', 'success');
 }
 
 </script>
