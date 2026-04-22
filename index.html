@@ -1144,100 +1144,116 @@
   <!-- AGENTS -->
 
   <div class="panel" id="panel-listings">
-    <div class="card">
-      <div class="defaults-title" style="font-size:13px;font-weight:600;color:#212529;margin-bottom:0.5rem">🏷️ eBay Listing Generator</div>
-      <p style="font-size:13px;color:#6c757d;margin-bottom:1rem">Upload photos, generate AI-cleaned covers, build collage, and let Taskmaster write your listing.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;height:calc(100vh - 120px)">
 
-      <div id="listing-source-card">
-        <div class="defaults-title" style="font-size:11px;margin-bottom:8px">LISTING SOURCE</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:1rem">
-          <button class="btn btn-secondary" onclick="setListingMode('bundle')" id="mode-bundle">From Bundle</button>
-          <button class="btn btn-secondary" onclick="setListingMode('single')" id="mode-single">Single Issue</button>
-          <button class="btn btn-secondary" onclick="setListingMode('custom')" id="mode-custom">Custom</button>
-        </div>
+      <!-- LEFT: PLAN & BUILD -->
+      <div style="overflow-y:auto;display:flex;flex-direction:column;gap:12px">
 
-        <div id="listing-bundle-picker" style="display:none">
-          <div class="field">
-            <label>Bundle Name</label>
-            <input type="text" id="listing-bundle-name" placeholder="Bundle will appear here from Bundles tab" style="width:100%;padding:8px;border:1px solid #dee2e6;border-radius:6px;font-size:13px" readonly />
+        <!-- Invoice Loader -->
+        <div class="card">
+          <div class="defaults-title" style="font-size:11px;margin-bottom:8px">INVOICE LOOKUP</div>
+          <div style="display:flex;gap:8px">
+            <input type="text" id="lgen-invoice" placeholder="Invoice number e.g. 827969" style="flex:1;padding:8px;border:1px solid #dee2e6;border-radius:6px;font-size:13px" />
+            <button class="btn btn-primary" onclick="lgenLoadInvoice()" style="white-space:nowrap">Load</button>
           </div>
-          <div id="listing-bundle-comics" style="font-size:13px;color:#6c757d;margin-top:8px"></div>
+          <div class="status" id="lgen-load-status" style="margin-top:8px"></div>
         </div>
 
-        <div id="listing-single-picker" style="display:none">
-          <div class="field">
-            <label>Search Comic</label>
-            <input type="text" id="listing-single-search" placeholder="SKU or series..." oninput="searchSingleListing()" style="width:100%;padding:8px;border:1px solid #dee2e6;border-radius:6px;font-size:13px" />
-          </div>
-          <div id="listing-single-results"></div>
+        <!-- Bundle List -->
+        <div class="card" id="lgen-bundles-card" style="display:none">
+          <div class="defaults-title" style="font-size:11px;margin-bottom:8px">BUNDLES <span id="lgen-bundle-count"></span></div>
+          <div id="lgen-bundle-list"></div>
         </div>
 
-        <div id="listing-manual-entry" style="margin-top:12px">
-          <div class="defaults-title" style="font-size:11px;margin-bottom:8px">COMIC DETAILS FOR LISTING</div>
-          <div id="listing-comics-list" style="margin-bottom:8px"></div>
-          <div style="display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:6px;align-items:end">
-            <input type="text" id="listing-entry-title" placeholder="Series title" style="padding:8px;border:1px solid #dee2e6;border-radius:6px;font-size:13px" />
-            <input type="text" id="listing-entry-issue" placeholder="Issue #" style="padding:8px;border:1px solid #dee2e6;border-radius:6px;font-size:13px" />
-            <input type="text" id="listing-entry-publisher" placeholder="Publisher" style="padding:8px;border:1px solid #dee2e6;border-radius:6px;font-size:13px" />
-            <button class="btn btn-secondary" onclick="addListingComic()" style="font-size:13px;white-space:nowrap">+ Add</button>
+        <!-- Queue -->
+        <div class="card">
+          <div class="defaults-title" style="font-size:11px;margin-bottom:8px">QUEUE (<span id="lgen-queue-count">0</span> listings)</div>
+          <div id="lgen-queue-list">
+            <p style="font-size:13px;color:#6c757d">No listings queued yet.</p>
           </div>
         </div>
-      </div>
 
-      <div style="margin-bottom:1rem">
-        <div class="defaults-title" style="font-size:11px;margin-bottom:8px">WATERMARK LOGO</div>
-        <div style="display:flex;align-items:center;gap:10px">
-          <div id="logo-preview-listing" style="font-size:13px;color:#6c757d">No logo uploaded</div>
-          <button class="btn btn-secondary" onclick="document.getElementById('logo-upload-input').click()" style="font-size:12px">Upload Logo</button>
-          <button class="btn btn-secondary" onclick="clearSavedLogo()" style="font-size:12px;color:#dc3545">Clear</button>
+        <!-- Manual Add -->
+        <div class="card">
+          <div class="defaults-title" style="font-size:11px;margin-bottom:8px">ADD MANUALLY</div>
+          <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:6px;margin-bottom:6px">
+            <input type="text" id="lgen-manual-title" placeholder="Series title" style="padding:8px;border:1px solid #dee2e6;border-radius:6px;font-size:13px" />
+            <input type="text" id="lgen-manual-issue" placeholder="Issue #" style="padding:8px;border:1px solid #dee2e6;border-radius:6px;font-size:13px" />
+            <input type="text" id="lgen-manual-publisher" placeholder="Publisher" style="padding:8px;border:1px solid #dee2e6;border-radius:6px;font-size:13px" />
+          </div>
+          <button class="btn btn-secondary" onclick="lgenAddManual()" style="width:100%;font-size:13px">+ Add to Queue</button>
         </div>
-        <input type="file" id="logo-upload-input" accept="image/png,image/jpeg" style="display:none" onchange="saveLogo(event)" />
+
       </div>
 
-      <div style="margin-top:1rem">
-        <div class="defaults-title" style="font-size:11px;margin-bottom:8px">PHOTOS (<span id="listing-photo-count">0</span> uploaded)</div>
-        <div class="drop-zone" id="listing-drop-zone"
-          onclick="document.getElementById('listing-photos').click()"
-          ondragover="event.preventDefault()"
-          ondrop="handleListingDrop(event)"
-          style="margin-bottom:1rem">
-          <div style="font-size:32px;margin-bottom:8px">📸</div>
-          <strong>Drop photos here or tap to select</strong>
-          <p style="color:#6c757d;font-size:13px">One photo per comic — AI will clean and crop each one</p>
-          <input type="file" id="listing-photos" accept="image/*" multiple style="display:none" onchange="handleListingPhotos(event)" />
+      <!-- RIGHT: FINALIZE -->
+      <div style="overflow-y:auto;display:flex;flex-direction:column;gap:12px">
+
+        <!-- Active Bundle Banner -->
+        <div class="card" id="lgen-active-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <div>
+              <div style="font-size:13px;font-weight:700" id="lgen-active-name">No active listing</div>
+              <div style="font-size:11px;color:#6c757d" id="lgen-active-detail">Select a bundle from the queue to begin</div>
+            </div>
+            <span id="lgen-active-badge" style="font-size:11px;padding:3px 10px;border-radius:10px;background:#f0f0f0;color:#6c757d">Pending</span>
+          </div>
         </div>
-        <div id="listing-photo-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:1rem"></div>
-      </div>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1rem">
-        <button class="btn btn-secondary" onclick="cleanAllListingPhotos()" id="listing-clean-btn">AI Clean Photos</button>
-        <button class="btn btn-secondary" onclick="buildListingCollage()" id="listing-collage-btn">Build Collage</button>
-        <button class="btn btn-primary" onclick="generateListing()" id="listing-generate-btn">Generate Listing</button>
-      </div>
-
-      <div id="listing-collage-output" style="display:none;margin-bottom:1rem">
-        <div class="defaults-title" style="font-size:11px;margin-bottom:8px">HERO COLLAGE</div>
-        <canvas id="listing-canvas" style="width:100%;border-radius:8px;border:1px solid #dee2e6"></canvas>
-      </div>
-
-      <div id="listing-draft" style="display:none">
-        <div class="defaults-title" style="font-size:11px;margin-bottom:8px">LISTING DRAFT</div>
-        <div class="field">
-          <label>Title</label>
-          <input type="text" id="listing-title" style="width:100%;padding:8px;border:1px solid #dee2e6;border-radius:6px;font-size:13px" />
+        <!-- Watermark Logo -->
+        <div class="card">
+          <div class="defaults-title" style="font-size:11px;margin-bottom:8px">WATERMARK LOGO</div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div id="logo-preview-listing" style="font-size:13px;color:#6c757d">No logo uploaded</div>
+            <button class="btn btn-secondary" onclick="document.getElementById('logo-upload-input').click()" style="font-size:12px">Upload Logo</button>
+            <button class="btn btn-secondary" onclick="clearSavedLogo()" style="font-size:12px;color:#dc3545">Clear</button>
+          </div>
+          <input type="file" id="logo-upload-input" accept="image/png,image/jpeg" style="display:none" onchange="saveLogo(event)" />
         </div>
-        <div class="field" style="margin-top:8px">
-          <label>Price</label>
-          <input type="number" id="listing-price" step="0.01" style="width:100%;padding:8px;border:1px solid #dee2e6;border-radius:6px;font-size:13px" />
-        </div>
-        <div class="field" style="margin-top:8px">
-          <label>Description</label>
-          <textarea id="listing-description" rows="6" style="width:100%;padding:8px;border:1px solid #dee2e6;border-radius:6px;font-size:13px;resize:vertical"></textarea>
-        </div>
-        <button class="btn btn-primary" onclick="publishListing()" style="width:100%;margin-top:12px">Publish to eBay</button>
-      </div>
 
-      <div class="status" id="listing-status"></div>
+        <!-- Photos -->
+        <div class="card">
+          <div class="defaults-title" style="font-size:11px;margin-bottom:8px">PHOTOS (<span id="listing-photo-count">0</span> uploaded)</div>
+          <div class="drop-zone" id="listing-drop-zone"
+            ondrop="handleListingDrop(event)" ondragover="event.preventDefault()"
+            onclick="document.getElementById('listing-file-input').click()"
+            style="border:2px dashed #dee2e6;border-radius:8px;padding:20px;text-align:center;cursor:pointer;margin-bottom:8px">
+            <div style="font-size:13px;color:#6c757d">Drop photos here or click to upload</div>
+          </div>
+          <input type="file" id="listing-file-input" multiple accept="image/*" style="display:none" onchange="handleListingFileInput(event)" />
+          <div id="listing-photo-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px"></div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <button class="btn btn-secondary" onclick="cleanAllListingPhotos()" id="listing-clean-btn" style="font-size:12px">AI Clean Photos</button>
+            <button class="btn btn-secondary" onclick="buildListingCollage()" id="listing-collage-btn" style="font-size:12px">Build Collage</button>
+            <button class="btn btn-secondary" onclick="lgenReusePhotos()" style="font-size:12px">♻️ Reuse from #1</button>
+          </div>
+        </div>
+
+        <!-- Collage Preview -->
+        <div class="card" id="listing-collage-card" style="display:none">
+          <div class="defaults-title" style="font-size:11px;margin-bottom:8px">COLLAGE PREVIEW</div>
+          <canvas id="listing-canvas" style="width:100%;border-radius:8px"></canvas>
+          <button class="btn btn-secondary" onclick="downloadCollage()" style="width:100%;margin-top:8px;font-size:12px">Download Collage</button>
+        </div>
+
+        <!-- Draft -->
+        <div class="card">
+          <div class="defaults-title" style="font-size:11px;margin-bottom:8px">LISTING DRAFT</div>
+          <input type="text" id="listing-title" placeholder="Title (auto-filled by Taskmaster)" style="width:100%;padding:8px;border:1px solid #dee2e6;border-radius:6px;font-size:13px;margin-bottom:6px" />
+          <div style="display:flex;gap:8px;margin-bottom:6px">
+            <input type="number" id="listing-price" placeholder="Price" style="width:120px;padding:8px;border:1px solid #dee2e6;border-radius:6px;font-size:13px" />
+            <span style="line-height:36px;font-size:13px;color:#6c757d">+ Free Shipping</span>
+          </div>
+          <textarea id="listing-description" placeholder="Description (auto-filled by Taskmaster)" rows="6" style="width:100%;padding:8px;border:1px solid #dee2e6;border-radius:6px;font-size:13px;margin-bottom:8px;resize:vertical"></textarea>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <button class="btn btn-primary" onclick="lgenGenerate()" style="flex:1;font-size:13px">⚔️ Generate Listing</button>
+            <button class="btn btn-secondary" onclick="lgenCopyDraft()" style="font-size:13px">📋 Copy</button>
+            <button class="btn btn-success" onclick="lgenMarkDone()" style="font-size:13px">✓ Done → Next</button>
+          </div>
+          <div class="status" id="listing-status" style="margin-top:8px"></div>
+        </div>
+
+      </div>
     </div>
   </div>
 
@@ -5294,6 +5310,290 @@ function getListingComicsString() {
     return listingSingleComic.fields['Series'] + ' #' + listingSingleComic.fields['Issue'];
   }
   return '';
+}
+
+
+// ── LISTING GENERATOR v2 ─────────────────────────────
+window._arc2Queue = window._arc2Queue || [];
+window._arc2ActiveIdx = -1;
+
+function lgenRenderQueue() {
+  const list = document.getElementById('lgen-queue-list');
+  const count = document.getElementById('lgen-queue-count');
+  if (!list) return;
+  count.textContent = window._arc2Queue.length;
+  if (!window._arc2Queue.length) {
+    list.innerHTML = '<p style="font-size:13px;color:#6c757d">No listings queued yet.</p>';
+    return;
+  }
+  list.innerHTML = window._arc2Queue.map((item, idx) => {
+    const isActive = idx === window._arc2ActiveIdx;
+    const statusColor = item.status === 'Done' ? '#198754' : item.status === 'Draft Ready' ? '#0066cc' : '#6c757d';
+    return '<div onclick="lgenActivate(' + idx + ')" style="display:flex;justify-content:space-between;align-items:center;padding:8px;margin-bottom:4px;border-radius:6px;cursor:pointer;border:2px solid ' + (isActive ? '#0066cc' : '#dee2e6') + ';background:' + (isActive ? '#e8f4fd' : '#fff') + '">' +
+      '<div>' +
+      '<div style="font-size:13px;font-weight:600">' + item.name + '</div>' +
+      '<div style="font-size:11px;color:#6c757d">' + (item.comicCount || '?') + ' comics</div>' +
+      '</div>' +
+      '<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:' + statusColor + '20;color:' + statusColor + '">' + item.status + '</span>' +
+      '</div>';
+  }).join('');
+}
+
+function lgenActivate(idx) {
+  window._arc2ActiveIdx = idx;
+  const item = window._arc2Queue[idx];
+  if (!item) return;
+
+  // Update banner
+  const nameEl = document.getElementById('lgen-active-name');
+  const detailEl = document.getElementById('lgen-active-detail');
+  const badgeEl = document.getElementById('lgen-active-badge');
+  if (nameEl) nameEl.textContent = item.name;
+  if (detailEl) detailEl.textContent = item.comicsString || '';
+  if (badgeEl) {
+    badgeEl.textContent = item.status;
+    badgeEl.style.background = item.isPremium ? '#F0E8FA' : '#E8F8F3';
+    badgeEl.style.color = item.isPremium ? '#7B3FB5' : '#198754';
+  }
+
+  // Restore photos
+  listingPhotos = item.photos || [];
+  renderListingPhotoGrid();
+
+  // Restore draft
+  const titleEl = document.getElementById('listing-title');
+  const priceEl = document.getElementById('listing-price');
+  const descEl = document.getElementById('listing-description');
+  if (item.draft) {
+    if (titleEl) titleEl.value = item.draft.title || '';
+    if (priceEl) priceEl.value = item.draft.price || '';
+    if (descEl) descEl.value = item.draft.description || '';
+  } else {
+    if (titleEl) titleEl.value = '';
+    if (priceEl) priceEl.value = '';
+    if (descEl) descEl.value = '';
+  }
+
+  lgenRenderQueue();
+}
+
+function lgenAddToQueue(item) {
+  // Check if already in queue by name
+  const existing = window._arc2Queue.findIndex(q => q.name === item.name);
+  if (existing >= 0) {
+    window._arc2Queue[existing] = item;
+  } else {
+    window._arc2Queue.push(item);
+  }
+  lgenRenderQueue();
+  // Auto-activate if first item
+  if (window._arc2Queue.length === 1) lgenActivate(0);
+}
+
+async function lgenLoadInvoice() {
+  const invoice = document.getElementById('lgen-invoice').value.trim();
+  if (!invoice) return;
+  showStatus('lgen-load-status', 'Loading invoice...', 'loading');
+
+  try {
+    let allRecords = [];
+    let offset = null;
+    do {
+      const body = { action: 'search', formula: '{Invoice Number}="' + invoice + '"' };
+      if (offset) body.offset = offset;
+      const res = await fetch('/.netlify/functions/airtable', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      const data = await res.json();
+      if (data.records) allRecords = allRecords.concat(data.records);
+      offset = data.offset || null;
+    } while (offset);
+
+    const forSale = allRecords.filter(r => {
+      const s = r.fields['Status'] || '';
+      return s === 'Ordered' || s === 'In Stock';
+    });
+
+    if (!forSale.length) {
+      showStatus('lgen-load-status', 'No records found for invoice ' + invoice, 'error');
+      return;
+    }
+
+    // Group by Series+Issue
+    const groups = {};
+    forSale.forEach(r => {
+      const series = (r.fields['Series'] || '').trim();
+      const issue = (r.fields['Issue'] || '').toString().trim();
+      const key = series + ' #' + issue;
+      if (!groups[key]) groups[key] = { key, series, issue, skus: [] };
+      const variant = (r.fields['Variant'] || '').trim().toUpperCase();
+      const variantDesc = (r.fields['Variant Description'] || '');
+      const isRatio = variantDesc.toLowerCase().includes('1:') || variantDesc.toLowerCase().includes('inc ') || variantDesc.toLowerCase().includes('incentive');
+      groups[key].skus.push({
+        id: r.id, sku: r.fields['SKU'], variant, variantDesc,
+        coverPrice: parseFloat(r.fields['Cover Price'] || 0),
+        purchasePrice: parseFloat(r.fields['Purchase Price'] || 0),
+        isRatio, assignment: 'single'
+      });
+    });
+
+    // Render bundle list
+    const bundleCard = document.getElementById('lgen-bundles-card');
+    const bundleList = document.getElementById('lgen-bundle-list');
+    const bundleCount = document.getElementById('lgen-bundle-count');
+    bundleCard.style.display = 'block';
+    bundleCount.textContent = '(' + Object.keys(groups).length + ' titles)';
+
+    bundleList.innerHTML = Object.values(groups).map(g => {
+      const safeKey = g.key.replace(/[^a-z0-9]/gi, '-');
+      const variants = [...new Set(g.skus.map(s => s.variant))].sort();
+      const coverTotal = g.skus.reduce((sum, s) => sum + s.coverPrice, 0);
+      const hasRatio = g.skus.some(s => s.isRatio);
+      return '<div style="padding:10px;border:1px solid #dee2e6;border-radius:8px;margin-bottom:8px">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">' +
+        '<div>' +
+        '<div style="font-size:13px;font-weight:700">' + g.key + '</div>' +
+        '<div style="font-size:11px;color:#6c757d">CVR ' + variants.join(', ') + (hasRatio ? ' ⭐' : '') + ' | ' + g.skus.length + ' copies | $' + coverTotal.toFixed(2) + ' cover total</div>' +
+        '</div>' +
+        '<button onclick="lgenStageBundle(this)" data-key="' + g.key + '" data-series="' + g.series + '" data-issue="' + g.issue + '" data-cover="' + coverTotal.toFixed(2) + '" data-count="' + g.skus.length + '" data-variants="' + variants.join(',') + '" data-premium="' + hasRatio + '" class="btn btn-primary" style="font-size:12px;white-space:nowrap">+ Queue</button>' +
+        '</div>' +
+        '</div>';
+    }).join('');
+
+    showStatus('lgen-load-status', forSale.length + ' comics loaded across ' + Object.keys(groups).length + ' titles', 'success');
+
+  } catch(e) {
+    showStatus('lgen-load-status', 'Error: ' + e.message, 'error');
+  }
+}
+
+function lgenStageBundle(btn) {
+  if (!btn) return;
+  const series = btn.dataset.series;
+  const issue = btn.dataset.issue;
+  const coverTotal = parseFloat(btn.dataset.cover);
+  const comicCount = parseInt(btn.dataset.count);
+  const variants = btn.dataset.variants;
+  const isPremium = btn.dataset.premium === 'true';
+  const name = series + ' #' + issue + (isPremium ? ' — Premium' : '');
+  const comicsString = series + ' #' + issue + ' CVR ' + variants;
+
+  lgenAddToQueue({
+    name, comicsString, comicCount, isPremium,
+    coverTotal, status: 'Pending',
+    photos: [], draft: null
+  });
+
+  btn.textContent = '✓ Queued';
+  btn.disabled = true;
+  btn.style.background = '#198754';
+}
+
+function lgenAddManual() {
+  const title = document.getElementById('lgen-manual-title').value.trim();
+  const issue = document.getElementById('lgen-manual-issue').value.trim();
+  const publisher = document.getElementById('lgen-manual-publisher').value.trim();
+  if (!title) { alert('Please enter a series title'); return; }
+  const name = title + (issue ? ' #' + issue : '') + (publisher ? ' (' + publisher + ')' : '');
+  lgenAddToQueue({
+    name, comicsString: name, comicCount: 1,
+    isPremium: false, coverTotal: 0, status: 'Pending',
+    photos: [], draft: null
+  });
+  document.getElementById('lgen-manual-title').value = '';
+  document.getElementById('lgen-manual-issue').value = '';
+  document.getElementById('lgen-manual-publisher').value = '';
+}
+
+function lgenReusePhotos() {
+  if (window._arc2Queue.length > 0 && window._arc2Queue[0].photos && window._arc2Queue[0].photos.length) {
+    listingPhotos = [...window._arc2Queue[0].photos];
+    renderListingPhotoGrid();
+    showStatus('listing-status', 'Photos copied from first queue item', 'success');
+  } else {
+    showStatus('listing-status', 'No photos found in first queue item', 'error');
+  }
+}
+
+async function lgenGenerate() {
+  const idx = window._arc2ActiveIdx;
+  if (idx < 0 || !window._arc2Queue[idx]) {
+    showStatus('listing-status', 'No active listing selected', 'error');
+    return;
+  }
+  const item = window._arc2Queue[idx];
+  showStatus('listing-status', 'Taskmaster is researching and writing your listing...', 'loading');
+
+  // Determine shipping tier
+  const count = item.comicCount || 1;
+  const shipping = count <= 9 ? 12.99 : count <= 15 ? 15.99 : count <= 25 ? 19.99 : 0;
+
+  try {
+    const res = await fetch('/.netlify/functions/agent2', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'generate_listing',
+        comics: item.comicsString,
+        count: count,
+        mode: count > 1 ? 'bundle' : 'single',
+        coverPriceTotal: item.coverTotal || null
+      })
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error || 'Generation failed');
+
+    document.getElementById('listing-title').value = data.title || '';
+    document.getElementById('listing-price').value = data.price || '';
+    document.getElementById('listing-description').value = data.description || '';
+
+    // Save draft to queue item
+    window._arc2Queue[idx].draft = { title: data.title, price: data.price, description: data.description };
+    window._arc2Queue[idx].status = 'Draft Ready';
+    window._arc2Queue[idx].photos = [...listingPhotos];
+    lgenRenderQueue();
+
+    showStatus('listing-status', 'Draft ready - review and copy or mark done', 'success');
+  } catch(e) {
+    showStatus('listing-status', 'Error: ' + e.message, 'error');
+  }
+}
+
+function lgenCopyDraft() {
+  const title = document.getElementById('listing-title').value;
+  const price = document.getElementById('listing-price').value;
+  const desc = document.getElementById('listing-description').value;
+  const text = 'TITLE: ' + title + '\n\nPRICE: $' + price + ' (Free Shipping)\n\nDESCRIPTION:\n' + desc;
+  navigator.clipboard.writeText(text).then(() => {
+    showStatus('listing-status', 'Copied to clipboard', 'success');
+  });
+}
+
+function lgenMarkDone() {
+  const idx = window._arc2ActiveIdx;
+  if (idx < 0 || !window._arc2Queue[idx]) return;
+
+  // Save current photos and draft
+  window._arc2Queue[idx].photos = [...listingPhotos];
+  const title = document.getElementById('listing-title').value;
+  const price = document.getElementById('listing-price').value;
+  const desc = document.getElementById('listing-description').value;
+  if (title) window._arc2Queue[idx].draft = { title, price, description: desc };
+  window._arc2Queue[idx].status = 'Done';
+
+  // Move to next pending
+  const nextIdx = window._arc2Queue.findIndex((item, i) => i > idx && item.status !== 'Done');
+  if (nextIdx >= 0) {
+    lgenActivate(nextIdx);
+    // Clear photos for next item
+    listingPhotos = window._arc2Queue[nextIdx].photos || [];
+    renderListingPhotoGrid();
+  } else {
+    showStatus('listing-status', 'All listings complete!', 'success');
+    window._arc2ActiveIdx = -1;
+    lgenRenderQueue();
+  }
 }
 
 </script>
