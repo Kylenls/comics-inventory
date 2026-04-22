@@ -3753,6 +3753,8 @@ async function saveBundlePlan() {
 
 // ── AGENT 2 ──────────────────────────────────────────
 // ── BUNDLE STAGING ───────────────────────────────────
+let listingQueue = [];
+let activeQueueIdx = -1;
 let stagedBundles = [];
 
 function renderStagedBar() {
