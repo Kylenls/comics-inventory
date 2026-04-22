@@ -3753,8 +3753,8 @@ async function saveBundlePlan() {
 
 // ── AGENT 2 ──────────────────────────────────────────
 // ── BUNDLE STAGING ───────────────────────────────────
-let listingQueue = [];
-let activeQueueIdx = -1;
+window._listingQueue = window._listingQueue || [];
+window._activeQueueIdx = window._activeQueueIdx !== undefined ? window._activeQueueIdx : -1;
 let stagedBundles = [];
 
 function renderStagedBar() {
@@ -3778,11 +3778,11 @@ function renderStagedBar() {
 
 function sendAllStagedToListings() {
   if (!stagedBundles.length) return;
-  listingQueue = [...stagedBundles];
-  activeQueueIdx = -1;
+  window._listingQueue = [...stagedBundles];
+  window._activeQueueIdx = -1;
   switchTab('listings');
   if (typeof renderListingQueue === 'function') renderListingQueue();
-  if (listingQueue.length > 0 && typeof activateQueueItem === 'function') activateQueueItem(0);
+  if (window._listingQueue.length > 0 && typeof activateQueueItem === 'function') activateQueueItem(0);
 }
 
 
