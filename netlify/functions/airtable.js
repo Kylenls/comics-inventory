@@ -16,7 +16,7 @@ exports.handler = async (event) => {
 
   try {
     const body = JSON.parse(event.body || '{}');
-    const { action, id, fields, table, formula, sortField, sortDir, maxRecords, offset, sessionCount } = body;
+    const { action, id, fields, table, formula, sortField, sortDir, maxRecords, sessionCount } = body;
     const useTable = table || TABLE;
 
     if (action === 'list') {
@@ -30,7 +30,7 @@ exports.handler = async (event) => {
         base(useTable).select({ ...params, pageSize: 100 }).eachPage(
           (pageRecords, fetchNextPage) => {
             pageRecords.forEach(r => records.push({ id: r.id, fields: r.fields }));
-            if (maxRecords) resolve();
+            if (maxRecords && records.length >= maxRecords) resolve();
             else fetchNextPage();
           },
           (err) => { if (err) reject(err); else resolve(); }
@@ -44,15 +44,14 @@ exports.handler = async (event) => {
       const params = { pageSize: 100 };
       if (formula) params.filterByFormula = formula;
       if (sortField) params.sort = [{ field: sortField, direction: sortDir || 'asc' }];
-      if (maxRecords) params.maxRecords = maxRecords;
+      // No maxRecords cap on search - always fetch all matching records
 
       const records = [];
       await new Promise((resolve, reject) => {
         base(useTable).select(params).eachPage(
           (pageRecords, fetchNextPage) => {
             pageRecords.forEach(r => records.push({ id: r.id, fields: r.fields }));
-            if (maxRecords && records.length >= maxRecords) resolve();
-            else fetchNextPage();
+            fetchNextPage();
           },
           (err) => { if (err) reject(err); else resolve(); }
         );
