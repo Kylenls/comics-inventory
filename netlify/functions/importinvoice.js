@@ -17,6 +17,24 @@ async function postToDiscord(message) {
   }
 }
 
+async function getNextSkuNum() {
+  // Scan ALL records to find the true highest COM- number
+  let maxNum = 0;
+  await new Promise((resolve, reject) => {
+    base(TABLE).select({
+      filterByFormula: "LEFT({SKU}, 4) = 'COM-'",
+      fields: ['SKU']
+    }).eachPage((records, fetchNextPage) => {
+      records.forEach(r => {
+        const num = parseInt((r.fields['SKU'] || '').replace('COM-', '')) || 0;
+        if (num > maxNum) maxNum = num;
+      });
+      fetchNextPage();
+    }, (err) => { if (err) reject(err); else resolve(); });
+  });
+  return maxNum + 1;
+}
+
 exports.handler = async (event) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
@@ -34,18 +52,8 @@ exports.handler = async (event) => {
       return { statusCode: 400, headers, body: JSON.stringify({ error: 'No items provided' }) };
     }
 
-    // Get next SKU number
-    const existing = await base(TABLE).select({
-      sort: [{ field: 'SKU', direction: 'desc' }],
-      maxRecords: 1,
-      fields: ['SKU']
-    }).firstPage();
-
-    let nextSkuNum = 1;
-    if (existing.length > 0) {
-      const lastSku = existing[0].fields['SKU'] || 'COM-00000';
-      nextSkuNum = (parseInt(lastSku.replace('COM-', '')) || 0) + 1;
-    }
+    // Get true next SKU - scans entire table
+    let nextSkuNum = await getNextSkuNum();
 
     let created = 0;
     let errors = 0;
@@ -90,7 +98,7 @@ exports.handler = async (event) => {
         try {
           await base(TABLE).create(fields);
           created++;
-        } catch (e) {
+        } catch(e) {
           console.error('Create error:', e.message);
           errors++;
         }
@@ -99,35 +107,29 @@ exports.handler = async (event) => {
       }
     }
 
-    // Calculate total cost
     const totalCost = items.reduce((sum, item) => sum + ((item.purchasePrice || 0) * (item.qty || 1)), 0);
-    const totalSkus = items.reduce((sum, item) => sum + (item.qty || 1), 0);
     const pubBreakdown = Object.entries(publishers).map(([p, n]) => `${p}: ${n}`).join(', ');
-
-    // Notify Discord
     const distributor = source === 'LunarCSV' ? 'Lunar Distribution' : source || 'Unknown';
-    const msg = `📦 **New Invoice Imported**\n` +
+
+    await postToDiscord(
+      `📦 **New Invoice Imported**\n` +
       `Invoice #${invoiceNumber || 'N/A'} — ${distributor}\n` +
       `📅 Order Date: ${invoiceDate || 'N/A'}\n` +
-      `📚 ${created} comics added (${items.length} SKUs × qty)\n` +
+      `📚 ${created} comics added\n` +
       `💰 Total cost: $${totalCost.toFixed(2)}\n` +
       `🏷️ SKUs: ${firstSku} → ${lastSku}\n` +
       `📊 Publishers: ${pubBreakdown || 'N/A'}\n` +
       (errors > 0 ? `⚠️ ${errors} errors\n` : '') +
-      `👁️ Watcher — please update cash flow and inventory counts.`;
-
-    await postToDiscord(msg);
+      `👁️ Watcher — please update cash flow and inventory counts.`
+    );
 
     return {
       statusCode: 200, headers,
       body: JSON.stringify({ success: true, created, errors, firstSku, lastSku })
     };
 
-  } catch (e) {
+  } catch(e) {
     console.error('importinvoice error:', e);
-    return {
-      statusCode: 500, headers,
-      body: JSON.stringify({ error: e.message })
-    };
+    return { statusCode: 500, headers, body: JSON.stringify({ error: e.message }) };
   }
 };
