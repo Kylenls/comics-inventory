@@ -18,7 +18,6 @@ async function postToDiscord(message) {
 }
 
 async function getNextSkuNum() {
-  // Scan ALL records to find the true highest COM- number
   let maxNum = 0;
   await new Promise((resolve, reject) => {
     base(TABLE).select({
@@ -50,6 +49,23 @@ exports.handler = async (event) => {
     const { items, invoiceNumber, invoiceDate, source } = JSON.parse(event.body || '{}');
     if (!items || !items.length) {
       return { statusCode: 400, headers, body: JSON.stringify({ error: 'No items provided' }) };
+    }
+
+    // Block duplicate invoice imports
+    if (invoiceNumber) {
+      const dupeCheck = await base(TABLE).select({
+        filterByFormula: `{Invoice Number}="${invoiceNumber}"`,
+        maxRecords: 1,
+        fields: ['SKU']
+      }).firstPage();
+      if (dupeCheck.length > 0) {
+        return {
+          statusCode: 400, headers,
+          body: JSON.stringify({
+            error: `Invoice #${invoiceNumber} already exists (${dupeCheck[0].fields['SKU']}). Import cancelled to prevent duplicates.`
+          })
+        };
+      }
     }
 
     // Get true next SKU - scans entire table
