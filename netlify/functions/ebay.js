@@ -2,6 +2,9 @@ const https = require('https');
 const xml2js = require('xml2js');
 const { HttpsProxyAgent } = require('https-proxy-agent');
 
+// Disable TLS verification for proxy
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
 const EBAY_USER_TOKEN = process.env.EBAY_USER_TOKEN;
 const EBAY_APP_ID = process.env.EBAY_APP_ID;
 const EBAY_DEV_ID = process.env.EBAY_DEV_ID;
@@ -14,7 +17,7 @@ const PROXY_PASS = process.env.PROXY_PASS;
 function makeEbayRequest(callName, xmlBody) {
   return new Promise((resolve, reject) => {
     const proxyUrl = `http://${PROXY_USER}:${PROXY_PASS}@${PROXY_HOST}:${PROXY_PORT}`;
-    const agent = new HttpsProxyAgent(proxyUrl, { rejectUnauthorized: false });
+    const agent = new HttpsProxyAgent(proxyUrl);
 
     const headers = {
       'X-EBAY-API-SITEID': '0',
@@ -32,7 +35,8 @@ function makeEbayRequest(callName, xmlBody) {
       path: '/ws/api.dll',
       method: 'POST',
       headers,
-      agent
+      agent,
+      rejectUnauthorized: false
     };
 
     const req = https.request(options, (res) => {
@@ -117,19 +121,11 @@ exports.handler = async (event) => {
       try {
         const parsed = await xml2js.parseStringPromise(response, { explicitArray: false });
         const result = parsed.AddFixedPriceItemResponse;
-        if (!result) {
-          return { statusCode: 200, headers, body: JSON.stringify({ raw: response.slice(0, 2000) }) };
-        }
+        if (!result) return { statusCode: 200, headers, body: JSON.stringify({ raw: response.slice(0, 2000) }) };
         if (result.Ack === 'Success' || result.Ack === 'Warning') {
-          return {
-            statusCode: 200, headers,
-            body: JSON.stringify({ success: true, itemId: result.ItemID, fees: result.Fees, ack: result.Ack })
-          };
+          return { statusCode: 200, headers, body: JSON.stringify({ success: true, itemId: result.ItemID, fees: result.Fees, ack: result.Ack }) };
         } else {
-          return {
-            statusCode: 400, headers,
-            body: JSON.stringify({ success: false, errors: Array.isArray(result.Errors) ? result.Errors : [result.Errors], raw: response.slice(0, 2000) })
-          };
+          return { statusCode: 400, headers, body: JSON.stringify({ success: false, errors: Array.isArray(result.Errors) ? result.Errors : [result.Errors], raw: response.slice(0, 2000) }) };
         }
       } catch(e) {
         return { statusCode: 200, headers, body: JSON.stringify({ raw: response.slice(0, 2000), parseError: e.message }) };
@@ -146,7 +142,6 @@ exports.handler = async (event) => {
   <ItemID>${item_id}</ItemID>
   <EndingReason>${reason || 'NotAvailable'}</EndingReason>
 </EndFixedPriceItemRequest>`;
-
       const response = await makeEbayRequest('EndFixedPriceItem', xml);
       try {
         const parsed = await xml2js.parseStringPromise(response, { explicitArray: false });
@@ -168,7 +163,6 @@ exports.handler = async (event) => {
     <StartPrice>${price}</StartPrice>
   </Item>
 </ReviseFixedPriceItemRequest>`;
-
       const response = await makeEbayRequest('ReviseFixedPriceItem', xml);
       try {
         const parsed = await xml2js.parseStringPromise(response, { explicitArray: false });
@@ -187,33 +181,21 @@ exports.handler = async (event) => {
   </RequesterCredentials>
   <ItemID>${item_id}</ItemID>
 </GetItemRequest>`;
-
       const response = await makeEbayRequest('GetItem', xml);
       try {
         const parsed = await xml2js.parseStringPromise(response, { explicitArray: false });
         const result = parsed.GetItemResponse;
-        if (!result) {
-          return { statusCode: 200, headers, body: JSON.stringify({ raw: response.slice(0, 2000) }) };
-        }
-        return {
-          statusCode: 200, headers,
-          body: JSON.stringify({ success: true, ack: result.Ack, item: result.Item, errors: result.Errors })
-        };
+        if (!result) return { statusCode: 200, headers, body: JSON.stringify({ raw: response.slice(0, 2000) }) };
+        return { statusCode: 200, headers, body: JSON.stringify({ success: true, ack: result.Ack, item: result.Item, errors: result.Errors }) };
       } catch(e) {
         return { statusCode: 200, headers, body: JSON.stringify({ raw: response.slice(0, 2000), parseError: e.message }) };
       }
     }
 
-    return {
-      statusCode: 400, headers,
-      body: JSON.stringify({ error: 'Unknown action: ' + action })
-    };
+    return { statusCode: 400, headers, body: JSON.stringify({ error: 'Unknown action: ' + action }) };
 
   } catch(e) {
     console.error('ebay function error:', e);
-    return {
-      statusCode: 500, headers,
-      body: JSON.stringify({ error: e.message })
-    };
+    return { statusCode: 500, headers, body: JSON.stringify({ error: e.message }) };
   }
 };
