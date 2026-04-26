@@ -6,9 +6,6 @@ const EBAY_APP_ID = process.env.EBAY_APP_ID;
 const EBAY_DEV_ID = process.env.EBAY_DEV_ID;
 const EBAY_CERT_ID = process.env.EBAY_CERT_ID;
 
-// eBay Trading API endpoint (production)
-const EBAY_API_URL = 'https://api.ebay.com/ws/api.dll';
-
 function makeEbayRequest(callName, xmlBody) {
   return new Promise((resolve, reject) => {
     const headers = {
@@ -23,7 +20,7 @@ function makeEbayRequest(callName, xmlBody) {
     };
 
     const options = {
-      hostname: 'api.ebay.com',
+      hostname: 'svcs.ebay.com',
       path: '/ws/api.dll',
       method: 'POST',
       headers
@@ -58,17 +55,13 @@ exports.handler = async (event) => {
     if (action === 'create_listing') {
       const {
         title, description, price, category_id,
-        condition_id, quantity, pictures,
-        item_specifics, shipping_profile_id,
-        payment_profile_id, return_profile_id
+        condition_id, quantity, pictures, item_specifics
       } = body;
 
-      // Build item specifics XML
       const specificsList = (item_specifics || []).map(s =>
         `<NameValueList><Name>${s.name}</Name><Value>${s.value}</Value></NameValueList>`
       ).join('');
 
-      // Build pictures XML
       const picturesList = (pictures || []).map(url =>
         `<PictureURL>${url}</PictureURL>`
       ).join('');
@@ -126,12 +119,11 @@ exports.handler = async (event) => {
           })
         };
       } else {
-        const errors = result.Errors;
         return {
           statusCode: 400, headers,
           body: JSON.stringify({
             success: false,
-            errors: Array.isArray(errors) ? errors : [errors]
+            errors: Array.isArray(result.Errors) ? result.Errors : [result.Errors]
           })
         };
       }
