@@ -14,7 +14,7 @@ const PROXY_PASS = process.env.PROXY_PASS;
 function makeEbayRequest(callName, xmlBody) {
   return new Promise((resolve, reject) => {
     const proxyUrl = `http://${PROXY_USER}:${PROXY_PASS}@${PROXY_HOST}:${PROXY_PORT}`;
-    const agent = new HttpsProxyAgent(proxyUrl);
+    const agent = new HttpsProxyAgent(proxyUrl, { rejectUnauthorized: false });
 
     const headers = {
       'X-EBAY-API-SITEID': '0',
