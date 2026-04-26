@@ -105,27 +105,25 @@ exports.handler = async (event) => {
 </AddFixedPriceItemRequest>`;
 
       const response = await makeEbayRequest('AddFixedPriceItem', xml);
-      const parsed = await xml2js.parseStringPromise(response, { explicitArray: false });
-      const result = parsed.AddFixedPriceItemResponse;
-
-      if (result.Ack === 'Success' || result.Ack === 'Warning') {
-        return {
-          statusCode: 200, headers,
-          body: JSON.stringify({
-            success: true,
-            itemId: result.ItemID,
-            fees: result.Fees,
-            ack: result.Ack
-          })
-        };
-      } else {
-        return {
-          statusCode: 400, headers,
-          body: JSON.stringify({
-            success: false,
-            errors: Array.isArray(result.Errors) ? result.Errors : [result.Errors]
-          })
-        };
+      try {
+        const parsed = await xml2js.parseStringPromise(response, { explicitArray: false });
+        const result = parsed.AddFixedPriceItemResponse;
+        if (!result) {
+          return { statusCode: 200, headers, body: JSON.stringify({ raw: response.slice(0, 2000) }) };
+        }
+        if (result.Ack === 'Success' || result.Ack === 'Warning') {
+          return {
+            statusCode: 200, headers,
+            body: JSON.stringify({ success: true, itemId: result.ItemID, fees: result.Fees, ack: result.Ack })
+          };
+        } else {
+          return {
+            statusCode: 400, headers,
+            body: JSON.stringify({ success: false, errors: Array.isArray(result.Errors) ? result.Errors : [result.Errors], raw: response.slice(0, 2000) })
+          };
+        }
+      } catch(e) {
+        return { statusCode: 200, headers, body: JSON.stringify({ raw: response.slice(0, 2000), parseError: e.message }) };
       }
     }
 
@@ -141,11 +139,12 @@ exports.handler = async (event) => {
 </EndFixedPriceItemRequest>`;
 
       const response = await makeEbayRequest('EndFixedPriceItem', xml);
-      const parsed = await xml2js.parseStringPromise(response, { explicitArray: false });
-      return {
-        statusCode: 200, headers,
-        body: JSON.stringify({ success: true, response: parsed })
-      };
+      try {
+        const parsed = await xml2js.parseStringPromise(response, { explicitArray: false });
+        return { statusCode: 200, headers, body: JSON.stringify({ success: true, response: parsed }) };
+      } catch(e) {
+        return { statusCode: 200, headers, body: JSON.stringify({ raw: response.slice(0, 2000), parseError: e.message }) };
+      }
     }
 
     if (action === 'revise_price') {
@@ -162,11 +161,12 @@ exports.handler = async (event) => {
 </ReviseFixedPriceItemRequest>`;
 
       const response = await makeEbayRequest('ReviseFixedPriceItem', xml);
-      const parsed = await xml2js.parseStringPromise(response, { explicitArray: false });
-      return {
-        statusCode: 200, headers,
-        body: JSON.stringify({ success: true, response: parsed })
-      };
+      try {
+        const parsed = await xml2js.parseStringPromise(response, { explicitArray: false });
+        return { statusCode: 200, headers, body: JSON.stringify({ success: true, response: parsed }) };
+      } catch(e) {
+        return { statusCode: 200, headers, body: JSON.stringify({ raw: response.slice(0, 2000), parseError: e.message }) };
+      }
     }
 
     if (action === 'get_listing') {
@@ -180,11 +180,19 @@ exports.handler = async (event) => {
 </GetItemRequest>`;
 
       const response = await makeEbayRequest('GetItem', xml);
-      const parsed = await xml2js.parseStringPromise(response, { explicitArray: false });
-      return {
-        statusCode: 200, headers,
-        body: JSON.stringify({ success: true, item: parsed.GetItemResponse?.Item })
-      };
+      try {
+        const parsed = await xml2js.parseStringPromise(response, { explicitArray: false });
+        const result = parsed.GetItemResponse;
+        if (!result) {
+          return { statusCode: 200, headers, body: JSON.stringify({ raw: response.slice(0, 2000) }) };
+        }
+        return {
+          statusCode: 200, headers,
+          body: JSON.stringify({ success: true, ack: result.Ack, item: result.Item, errors: result.Errors })
+        };
+      } catch(e) {
+        return { statusCode: 200, headers, body: JSON.stringify({ raw: response.slice(0, 2000), parseError: e.message }) };
+      }
     }
 
     return {
