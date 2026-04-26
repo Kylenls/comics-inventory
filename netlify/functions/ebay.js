@@ -1,13 +1,21 @@
 const https = require('https');
 const xml2js = require('xml2js');
+const { HttpsProxyAgent } = require('https-proxy-agent');
 
 const EBAY_USER_TOKEN = process.env.EBAY_USER_TOKEN;
 const EBAY_APP_ID = process.env.EBAY_APP_ID;
 const EBAY_DEV_ID = process.env.EBAY_DEV_ID;
 const EBAY_CERT_ID = process.env.EBAY_CERT_ID;
+const PROXY_HOST = process.env.PROXY_HOST;
+const PROXY_PORT = process.env.PROXY_PORT;
+const PROXY_USER = process.env.PROXY_USER;
+const PROXY_PASS = process.env.PROXY_PASS;
 
 function makeEbayRequest(callName, xmlBody) {
   return new Promise((resolve, reject) => {
+    const proxyUrl = `http://${PROXY_USER}:${PROXY_PASS}@${PROXY_HOST}:${PROXY_PORT}`;
+    const agent = new HttpsProxyAgent(proxyUrl);
+
     const headers = {
       'X-EBAY-API-SITEID': '0',
       'X-EBAY-API-COMPATIBILITY-LEVEL': '967',
@@ -23,7 +31,8 @@ function makeEbayRequest(callName, xmlBody) {
       hostname: 'svcs.ebay.com',
       path: '/ws/api.dll',
       method: 'POST',
-      headers
+      headers,
+      agent
     };
 
     const req = https.request(options, (res) => {
